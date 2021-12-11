@@ -33,9 +33,6 @@ inline void InitFormationParas(){
 
 void map_init(double target[][2], double addr[][2], double theta)
 {
-
-    InitFormationParas();
-
     for (int i = 0; i < robot_num; i++)
     {
         polarTar[i][0] = sqrt(target[i][0] * target[i][0] + target[i][1] * target[i][1]);
@@ -197,6 +194,8 @@ double sstarget[5][2];
 double ssadd[5][2];
 
 void FormationChoose(){
+
+    InitFormationParas();
 
     double star_cost,circ_cost,thro_cost;
 
