@@ -5,7 +5,6 @@
 
 #include <swarm_robot_control.h>
 #include <cmath>
-#include <math.h>
 #include <iostream>
 
 //double arctan(double y, double x);
@@ -22,17 +21,15 @@ using namespace std;
 /* First: Set ids of swarm robot based on Aruco marker */
 std::vector<int> swarm_robot_id{1, 2, 3, 4, 5};
 
-ros::NodeHandle nh;
-
-/* Initialize swarm robot */
-SwarmRobot swarm_robot(&nh, swarm_robot_id);
-
 /* Main function */
 int main(int argc, char** argv) {
 
     ros::init(argc, argv, "swarm_robot_control_formation");
 
+    ros::NodeHandle nh;
 
+    /* Initialize swarm robot */
+    SwarmRobot swarm_robot(&nh, swarm_robot_id);
 
     /* Set L Matrix */
     Eigen::MatrixXd lap(robot_num, robot_num);
@@ -78,8 +75,11 @@ int main(int argc, char** argv) {
     double theta_sum;
     int judge_cnt = 0;
 
-    PositionRefresh();
+    PositionRefresh(swarm_robot);
     FormationChoose();
+
+    extern Eigen::VectorXd star_form_x;
+    extern Eigen::VectorXd star_form_y;
 
     /* While loop */
     while(! is_conv) {
@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
                 }
                 double face_angle = atan2((PositionGetY()(j) - PositionGetY()(i)), (PositionGetX()(j) - PositionGetX()(i))) - PositionGetTheta()(i);
                 double y_distance = std::fabs((PositionGetY()(j) - PositionGetY()(i)));
-                double x_distance = std::fabs((PositionGetX()j) - PositionGetX()(i)));
+                double x_distance = std::fabs((PositionGetX()(j) - PositionGetX()(i)));
                 double distance = sqrt(x_distance*x_distance + y_distance*y_distance);
                 //ROS_INFO_STREAM(i << " to " << j <<" face angle: " << face_angle << " y distance: " << y_distance);
                 //ROS_INFO_STREAM("this is test cpp file");
@@ -147,7 +147,7 @@ int main(int argc, char** argv) {
         ros::Duration(0.05).sleep();
 
         /* Get swarm robot poses */
-        PositionRefresh();
+        PositionRefresh(swarm_robot);
     }
 
     /* Stop all robots */

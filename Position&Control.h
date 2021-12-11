@@ -6,8 +6,9 @@
 #define SRC_POSITION_CONTROL_H
 
 #include <vector>
+#include <swarm_robot_control.h>
 
-void PositionRefresh();
+void PositionRefresh(SwarmRobot& swarm_robot);
 
 Eigen::VectorXd& PositionGetX();
 Eigen::VectorXd& PositionGetY();

@@ -16,7 +16,9 @@ Eigen::VectorXd del_theta(swarm_robot_id.size());
 
 std::vector<std::vector<double>> current_robot_pose(swarm_robot_id.size());
 
-void PositionRefresh(){
+extern SwarmRobot swarm_robot;
+
+void PositionRefresh(SwarmRobot& swarm_robot){
     /* Get swarm robot poses firstly */
 
     swarm_robot.getRobotPose(current_robot_pose);
@@ -62,7 +64,7 @@ void ControlX(const Eigen::VectorXd& vx){
 void ControlY(const Eigen::VectorXd& vy){
     del_y = vy;
 }
-void ControlX(const Eigen::VectorXd& w){
+void ControlTheta(const Eigen::VectorXd& w){
     del_theta = w;
 }
 
