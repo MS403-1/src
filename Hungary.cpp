@@ -23,6 +23,13 @@ int FH[N], FL[N];
 int Maxx, Mx;
 double st[N * N];
 int used[N * N], tot;
+
+void storeP()
+{
+    for (int i = 0; i < robot_num; i++)
+        nowp[i] = p[i];
+}
+
 void dfs(int s, double t, double sum) {
     if (sum > Mx) {
         Mx = sum;

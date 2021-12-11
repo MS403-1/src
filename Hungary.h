@@ -8,12 +8,11 @@
 #include <cstdio>
 #include <algorithm>
 
-constexpr int M = 11;
-constexpr int N = 11;
-constexpr int robot_num = 5;
+#include "Params.h"
 
 extern int p[], nowp[];
 
+void storeP();
 double calc(double b[N][N], int n);
 
 #endif //SRC_HUNGARY_H
