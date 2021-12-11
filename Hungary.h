@@ -10,6 +10,9 @@
 
 constexpr int M = 11;
 constexpr int N = 11;
+constexpr int robot_num = 5;
+
+extern int p[], nowp[];
 
 double calc(double b[N][N], int n);
 

@@ -6,6 +6,9 @@
 
 using namespace std;
 
+int p[robot_num];         //记录当前右侧元素所对应的左侧元素
+int nowp[robot_num];      //记录右侧元素是否已被访问过
+
 int HZ[N], LZ[N];
 
 struct Pair {

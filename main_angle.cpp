@@ -11,16 +11,12 @@
 //double arctan(double y, double x);
 
 #include "Hungary.h"
-#include "Formation.h"
+//#include "Formation.h"
 
 
 using namespace std;
-const int robot_num = 5;
 
 double Map[N][N]; //邻接矩阵存图
-int p[robot_num];         //记录当前右侧元素所对应的左侧元素
-int nowp[robot_num];
-//记录右侧元素是否已被访问过
 
 
 
