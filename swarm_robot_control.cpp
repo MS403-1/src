@@ -9,9 +9,9 @@ SwarmRobot::SwarmRobot(ros::NodeHandle *nh, std::vector<int> swarm_robot_id_):
         swarm_robot_id(swarm_robot_id_)
 {
 
-    this->robot_num = swarm_robot_id.size();
+    this->ROBOT_NUM = swarm_robot_id.size();
 
-    std::cout << "robot_num="<< robot_num <<std::endl;
+    std::cout << "ROBOT_NUM="<< robot_num <<std::endl;
     /* Initialize swarm robot */
     for(int i = 0; i < 10; i++) {
         std::string vel_topic = "/robot_" + std::to_string(i+1) + "/cmd_vel";
@@ -66,17 +66,17 @@ bool SwarmRobot::getRobotPose(int index, std::vector<double> &pose_cur) {
 /* Get gazebo pose of swarm robot */
 bool SwarmRobot::getRobotPose(std::vector<std::vector<double> > &current_robot_pose) {
 
-    current_robot_pose.resize(this->robot_num);
-    std::vector<bool> flag_pose(this->robot_num, false);
+    current_robot_pose.resize(this->ROBOT_NUM);
+    std::vector<bool> flag_pose(this->ROBOT_NUM, false);
 
     bool flag = false;
 
     while(! flag) {
         flag = true;
-        for(int i = 0; i < this->robot_num; i++) {
+        for(int i = 0; i < this->ROBOT_NUM; i++) {
             flag = flag && flag_pose[i];
         }
-        for(int i = 0; i < this->robot_num; i++) {
+        for(int i = 0; i < this->ROBOT_NUM; i++) {
             std::vector<double> pose_robot(3);
             if(getRobotPose(i, pose_robot)) {
                 current_robot_pose[i] = pose_robot;
@@ -100,13 +100,13 @@ bool SwarmRobot::moveRobot(int index, double v, double w) {
 
 /* Move all robots*/
 bool SwarmRobot::moveRobot(std::vector< std::vector<double> > &speed) {
-  if(this->robot_num != speed.size())
+  if(this->ROBOT_NUM != speed.size())
   {
     ROS_INFO_STREAM("The robot number does not equal the speed number!");
     return false;
   }
 
-  for(int i=0; i<this->robot_num; i++)
+  for(int i=0; i<this->ROBOT_NUM; i++)
   {
     if(!this->moveRobot(this->swarm_robot_id[i],speed[i][0],speed[i][1]))
     {
@@ -133,7 +133,7 @@ bool SwarmRobot::stopRobot() {
     geometry_msgs::Twist vel_msg;
     vel_msg.linear.x = 0.0;
     vel_msg.angular.z = 0.0;
-    for(int i = 0; i < this->robot_num; i++) {
+    for(int i = 0; i < this->ROBOT_NUM; i++) {
         cmd_vel_pub[this->swarm_robot_id[i]-1].publish(vel_msg);
     }
     ROS_INFO_STREAM("Stop all robots.");

@@ -22,6 +22,4 @@ void ControlX(const Eigen::VectorXd& vx);
 void ControlY(const Eigen::VectorXd& vy);
 void ControlTheta(const Eigen::VectorXd& w);
 
-std::vector<std::vector<double>>& GetCurrentPose();
-
 #endif //SRC_POSITION_CONTROL_H

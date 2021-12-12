@@ -6,14 +6,14 @@
 
 using namespace std;
 
-int p[robot_num];         //记录当前右侧元素所对应的左侧元素
-int nowp[robot_num];      //记录右侧元素是否已被访问过
+int p[ROBOT_NUM];         //记录当前右侧元素所对应的左侧元素
+int nowp[ROBOT_NUM];      //记录右侧元素是否已被访问过
 
 int HZ[N], LZ[N];
 
 struct Pair {
     int x, y;
-    Pair(int x = 0, int y = 0) :x(x), y(y) {}
+    explicit Pair(int x = 0, int y = 0) :x(x), y(y) {}
     bool operator < (const Pair& b) const {
         return HZ[this->x] == HZ[b.x] ? LZ[this->y] < LZ[b.y] : HZ[this->x] < HZ[b.x];
     }
@@ -26,7 +26,7 @@ int used[N * N], tot;
 
 void storeP()
 {
-    for (int i = 0; i < robot_num; i++)
+    for (int i = 0; i < ROBOT_NUM; i++)
         nowp[i] = p[i];
 }
 
@@ -74,7 +74,7 @@ double calc(double b[N][N], int n) {
     //先让每行每列都有0
 //Out(a,v,n);
     int H[N], L[N];
-    while (1) {
+    while (true) {
 
         for (int i = 1; i <= n; i++) {
             H[i] = L[i] = 0; //H[i]，第i行有多少个0，L为列
@@ -87,7 +87,7 @@ double calc(double b[N][N], int n) {
                     H[i]++; L[j]++;
                 }
         int cnt = 0;
-        while (1) {
+        while (true) {
             int tpcnt = cnt;
             for (int i = 1; i <= n; i++) //找每行单独的0画‘O’，同列画‘X’
                 if (H[i] == 1) {
@@ -154,7 +154,7 @@ double calc(double b[N][N], int n) {
         int cas = 1;//时间戳，每次只检查新增对号行/列
         for (int i = 1; i <= n; i++)
             if (!FH[i]) flagx[i] = cas;
-        bool chang = 1;
+        bool chang = true;
         while (chang) {
             chang = 0;
             cas++;
@@ -163,14 +163,14 @@ double calc(double b[N][N], int n) {
                     for (int j = 1; j <= n; j++)
                         if (v[i][j] == -1) {
                             flagy[j] = cas;
-                            chang = 1;
+                            chang = true;
                         }
             for (int i = 1; i <= n; i++)
                 if (flagy[i] == cas - 1)
                     for (int j = 1; j <= n; j++)
                         if (v[j][i] == 1) {
                             flagx[j] = cas;
-                            chang = 1;
+                            chang = true;
                         }
         }
         double Mi = ~0u >> 2;

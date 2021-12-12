@@ -8,18 +8,18 @@
 double Map[N][N]; //邻接矩阵存图
 
 
-double polarTar[robot_num][2];
-double polaradd[robot_num][2];
+double polarTar[ROBOT_NUM][2];
+double polaradd[ROBOT_NUM][2];
 
 
-Eigen::VectorXd star_form_x(robot_num);
-Eigen::VectorXd star_form_y(robot_num);
+Eigen::VectorXd star_form_x(ROBOT_NUM);
+Eigen::VectorXd star_form_y(ROBOT_NUM);
 
-Eigen::VectorXd circ_form_x(robot_num);
-Eigen::VectorXd circ_form_y(robot_num);
+Eigen::VectorXd circ_form_x(ROBOT_NUM);
+Eigen::VectorXd circ_form_y(ROBOT_NUM);
 
-Eigen::VectorXd thro_form_x(robot_num);
-Eigen::VectorXd thro_form_y(robot_num);
+Eigen::VectorXd thro_form_x(ROBOT_NUM);
+Eigen::VectorXd thro_form_y(ROBOT_NUM);
 
 
 inline void InitFormationParas(){
@@ -33,7 +33,7 @@ inline void InitFormationParas(){
 
 void map_init(double target[][2], double addr[][2], double theta)
 {
-    for (int i = 0; i < robot_num; i++)
+    for (int i = 0; i < ROBOT_NUM; i++)
     {
         polarTar[i][0] = sqrt(target[i][0] * target[i][0] + target[i][1] * target[i][1]);
         polarTar[i][1] = atan2(target[i][1], target[i][0]);
@@ -41,8 +41,8 @@ void map_init(double target[][2], double addr[][2], double theta)
         polaradd[i][1] = atan2(addr[i][1], addr[i][0]);
     }
 
-    for (int i = 0; i < robot_num; i++)
-        for (int j = 0; j < robot_num; j++)
+    for (int i = 0; i < ROBOT_NUM; i++)
+        for (int j = 0; j < ROBOT_NUM; j++)
         {
             Map[i + 1][j + 1] = sqrt(polarTar[j][0] * polarTar[j][0] + polaradd[i][0] * polaradd[i][0] - 2 * polarTar[j][0] * polaradd[i][0] * cos(polaradd[i][1] - (polarTar[j][1] + theta)));
         }
@@ -53,21 +53,22 @@ double besttheta(double theta_ini);
 double targetCost(double target[][2], double addr[][2])
 {
 
-    double centerX[2]={0,0};
-    double centerY[2]={0,0};
-    for (int i = 0; i < robot_num; i++)
+    double centerX[2] = {0,0};
+    double centerY[2] = {0,0};
+    for (int i = 0; i < ROBOT_NUM; i++)
     {
         centerX[0] += addr[i][0];
         centerY[0] += addr[i][1];
         centerX[1] += target[i][0];
         centerY[1] += target[i][1];
-
     }
-    centerX[0] /= robot_num;
-    centerY [0]/= robot_num;
-    centerX[1] /= robot_num;
-    centerY [1]/= robot_num;
-    for (int i = 0; i < robot_num; i++)
+
+    centerX[0] /= ROBOT_NUM;
+    centerY[0] /= ROBOT_NUM;
+    centerX[1] /= ROBOT_NUM;
+    centerY[1] /= ROBOT_NUM;
+
+    for (int i = 0; i < ROBOT_NUM; i++)
     {
         addr[i][0] -= centerX[0];
         addr[i][1] -= centerY[0];
@@ -79,14 +80,14 @@ double targetCost(double target[][2], double addr[][2])
 
     map_init(target, addr, theta);
 
-    cost = calc(Map, robot_num);
+    cost = calc(Map, ROBOT_NUM);
     storeP();
 
     for (int i = -20; i < 20; i++)
     {
         map_init(target, addr, 3.14 * i / 20);
 
-        double tmp  = calc(Map, robot_num);
+        double tmp  = calc(Map, ROBOT_NUM);
         std::cout<<tmp<<" ";
         if (tmp < cost)
         {
@@ -109,7 +110,7 @@ double targetCost(double target[][2], double addr[][2])
     {
         double thetanew = besttheta(theta);
         map_init(target, addr, thetanew);
-        cost2 = calc(Map, robot_num);
+        cost2 = calc(Map, ROBOT_NUM);
         if (cost2 < cost)
         {
             theta=thetanew;
@@ -137,7 +138,7 @@ double targetCost(double target[][2], double addr[][2])
 double dtheta(double theta)
 {
     double d = 0;
-    for (int i = 0; i < robot_num; i++)
+    for (int i = 0; i < ROBOT_NUM; i++)
     {
         double tmp = sqrt(polarTar[p[i]][0] * polarTar[p[i]][0] + polaradd[i][0] * polaradd[i][0] - 2 * polarTar[p[i]][0] * polaradd[i][0] * cos(polaradd[i][1] - (polarTar[p[i]][1] + theta)));
         if (tmp == 0)
@@ -205,7 +206,7 @@ void FormationChoose(){
         sstarget[i][0] = star_form_x(i);
         sstarget[i][1] = star_form_y(i);
     }
-    star_cost=targetCost(sstarget, ssadd);
+    star_cost = targetCost(sstarget, ssadd);
     for(int i = 0; i <5; i++) {
         star_form_x(i) = sstarget[nowp[i]][0];
         star_form_y(i) = sstarget[nowp[i]][1];

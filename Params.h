@@ -7,6 +7,6 @@
 
 constexpr int M = 11;
 constexpr int N = 11;
-constexpr int robot_num = 5;
+constexpr int ROBOT_NUM = 5;
 
 #endif //SRC_PARAMS_H

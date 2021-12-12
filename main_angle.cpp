@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
     SwarmRobot swarm_robot(&nh, swarm_robot_id);
 
     /* Set L Matrix */
-    Eigen::MatrixXd lap(robot_num, robot_num);
+    Eigen::MatrixXd lap(ROBOT_NUM, ROBOT_NUM);
     lap <<  4, -1, -1, -1, -1,
             -1, 4, -1, -1, -1,
             -1, -1, 4, -1, -1,
@@ -41,18 +41,18 @@ int main(int argc, char** argv) {
 
 
     /* Convergence threshold */
-    double conv_th = 0.2;   // Threshold of angle, in rad
-    double dis_th = 0.05;    // Threshold of distance, in m
-    double angle_th = 0.05;  // Threshold of angle, in rad
+    constexpr double conv_th = 0.2;   // Threshold of angle, in rad
+    constexpr double dis_th = 0.05;    // Threshold of distance, in m
+    constexpr double angle_th = 0.05;  // Threshold of angle, in rad
 
 
     /* Velocity scale and threshold */
-    double MAX_W = 1;       // Maximum angle velocity (rad/s)
-    double MIN_W = 0.05;    // Minimum angle velocity(rad/s)
-    double MAX_V = 0.2;     // Maximum linear velocity(m/s)
-    double MIN_V = 0.01;    // Minimum linear velocity(m/s)
-    double k_w = 0.12;       // Scale of angle velocity
-    double k_v = 0.1;       // Scale of linear velocity
+    constexpr double MAX_W = 1;       // Maximum angle velocity (rad/s)
+    constexpr double MIN_W = 0.05;    // Minimum angle velocity(rad/s)
+    constexpr double MAX_V = 0.2;     // Maximum linear velocity(m/s)
+    constexpr double MIN_V = 0.01;    // Minimum linear velocity(m/s)
+    constexpr double k_w = 0.12;       // Scale of angle velocity
+    constexpr double k_v = 0.1;       // Scale of linear velocity
 
 
 
@@ -61,8 +61,8 @@ int main(int argc, char** argv) {
 //    std::cout <<"star_form_x" << star_form_x[0] << star_form_x[1] << star_form_x[2] << star_form_x[3] << star_form_x[4] << std::endl;
 //    std::cout <<"star_form_y" << star_form_y[0] << star_form_y[1] << star_form_y[2] << star_form_y[3] << star_form_y[4] << std::endl;
 
-    Eigen::VectorXd d(robot_num);
-    Eigen::VectorXd d_(robot_num);
+    Eigen::VectorXd d(ROBOT_NUM);
+    Eigen::VectorXd d_(ROBOT_NUM);
 
 
 
@@ -92,7 +92,7 @@ int main(int argc, char** argv) {
         //std::cout << "del_x" << "= " << del_x << std::endl;
 
         judge_cnt = 0;
-        for (int i = 0; i < robot_num; i++){
+        for (int i = 0; i < ROBOT_NUM; i++){
             if(/*std::fabs(del_theta(i)) < angle_th && */std::fabs(ControlGetY()(i)) < dis_th && std::fabs(ControlGetX()(i)) < dis_th){
                 judge_cnt++;
             }
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
 
 
         /* Swarm robot move */
-        for(int i = 0; i < robot_num; i++) {
+        for(int i = 0; i < ROBOT_NUM; i++) {
             //determine the velocity
             double v_x = ControlGetX()(i) * k_v;
             double v_y = ControlGetY()(i) * k_v;
@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
             //std::cout << 'w' << i << "= "  << w << std::endl;
 
             //avoid face to face crash
-            for(int j = 0; j < robot_num; j++){
+            for(int j = 0; j < ROBOT_NUM; j++){
                 if(i == j){
                     continue;
                 }
