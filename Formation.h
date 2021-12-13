@@ -12,12 +12,17 @@
 #include "Params.h"
 #include "Position&Control.h"
 
+typedef struct{
+    double theta;
+    double cost;
+}formation_cost_t;
+
 typedef Eigen::VectorXd* (form_info_t)[2];
 
 extern Eigen::VectorXd expectedX;
 extern Eigen::VectorXd expectedY;
 
 void FormationChoose();
-double targetCost(form_info_t);
+formation_cost_t targetCost(Eigen::VectorXd *[2]);
 
 #endif //SRC_FORMATION_H

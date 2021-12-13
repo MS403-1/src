@@ -17,11 +17,14 @@ Eigen::VectorXd form_circ_x(ROBOT_NUM);
 Eigen::VectorXd form_circ_y(ROBOT_NUM);
 Eigen::VectorXd form_thro_x(ROBOT_NUM);
 Eigen::VectorXd form_thro_y(ROBOT_NUM);
+Eigen::VectorXd form_line_x(ROBOT_NUM);
+Eigen::VectorXd form_line_y(ROBOT_NUM);
 
 Eigen::VectorXd* forms[][2] = {
         {&form_star_x, &form_star_y},
         {&form_circ_x, &form_circ_y},
         {&form_thro_x, &form_thro_y},
+        {&form_line_x, &form_line_y},
 };
 
 constexpr int FORM_NUM = sizeof(forms) / sizeof(Eigen::VectorXd*) / 2;
@@ -33,15 +36,17 @@ inline void InitFormationParas(){
     form_circ_y << 0.8, 0.247, -0.647, -0.470, 0.247;
     form_thro_x << 0, 0.6, 0.6, 1.2, 1.2;
     form_thro_y << 0, 0.3, -0.3, 0.6, -0.6;
+    form_line_x << 0, 0.6, -0.6, 1.2, -1.2;
+    form_line_y << 0, 0, 0, 0, 0;
 }
 
-void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo){
+void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo, double theta) {
     for(auto i = 0; i < ROBOT_NUM; i++) {
         for (auto j = 0; j < ROBOT_NUM; j++) {
             Map[i + 1][j + 1] = sqrt(   \
-                    (positionToCenter[0](i) - (*formInfo[0])(j)) * (positionToCenter[0](i) - (*formInfo[0])(j)) \
+                    (positionToCenter[0](i) - cos(theta) * (*formInfo[0])(j) - sin(theta) * (*formInfo[1])(j)) * (positionToCenter[0](i) - cos(theta) * (*formInfo[0])(j) - sin(theta) * (*formInfo[1])(j)) \
                         + \
-                    (positionToCenter[1](i) - (*formInfo[1])(j)) * (positionToCenter[1](i) - (*formInfo[1])(j)) \
+                    (positionToCenter[1](i) + sin(theta) * (*formInfo[0])(j) - cos(theta) * (*formInfo[1])(j)) * (positionToCenter[1](i) + sin(theta) * (*formInfo[0])(j) - cos(theta) * (*formInfo[1])(j)) \
                 );
         }
     }
@@ -53,8 +58,6 @@ void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo){
         ROS_INFO("\r\n");
     }
 }
-
-//double besttheta(double theta_ini);
 
 Eigen::VectorXd centerPosition[2];
 Eigen::VectorXd positionToCenter[2];
@@ -72,126 +75,33 @@ void UpdateCenterPosition() {
     positionToCenter[1] -= centerPosition[1];
 }
 
-double targetCost(form_info_t formInfo)
+/**
+ * @brief Calculate the minimum cost of all possible angle
+ * @param formInfo The given formation
+ * @return minimum cost and the theta
+ */
+formation_cost_t targetCost(Eigen::VectorXd *formInfo[2])
 {
-//    double theta = 0;
+    double minCostTheta = -3.14;
+    double minCost = 100000;
 
-    map_init(positionToCenter, formInfo);
-
-    double cost = calc(Map, ROBOT_NUM);
-//    storeP();
-
-/*    for (int i = -20; i < 20; i++)
-    {
-        map_init(position);
-
-        double tmp  = calc(Map, ROBOT_NUM);
-        std::cout<<tmp<<" ";
-        if (tmp < cost)
-        {
-            cost = tmp;
-            theta = 3.14 * i / 20;
-
-            storeP();
+    constexpr int ITER_NUM = 20;
+    for(auto thetaIter = -ITER_NUM; thetaIter < ITER_NUM; thetaIter++) {
+        map_init(positionToCenter, formInfo, 3.14 * thetaIter / 20);
+        double cost = calc(Map, ROBOT_NUM);
+        if(cost < minCost){
+            minCost = cost;
+            minCostTheta = 3.14 * thetaIter / 20;
         }
-
-    }*/
-
-    for (int i = 0; i < ROBOT_NUM; i++)
-    {
-        std::cout << nowp[i] << " ";
     }
 
-    /*std::cout << std::endl;
-    double cost2;
-    while (true)
-    {
-        double thetanew = besttheta(theta);
-        map_init();
-        cost2 = calc(Map, ROBOT_NUM);
-        if (cost2 < cost)
-        {
-            theta=thetanew;
-            storeP();
-            cost = cost2;
-        }
-        else{
-            for(int i=0;i<5;i++)
-                std::cout<<target[i][0]<<" "<<target[i][1]<<std::endl;
-            for (int i = 0; i < 5; i++)
-            {
-                std::cout << nowp[i] << " ";
+    /**     refresh P     */
+    map_init(positionToCenter, formInfo, minCostTheta);
+    calc(Map, ROBOT_NUM);
 
-                double a=cos(theta)*target[i][0]-sin(theta)*target[i][1];
-                double b=sin(theta)*target[i][0]+cos(theta)*target[i][1];
-                target[i][0]=a;
-                target[i][1]=b;
-            }
-
-            std::cout<<theta<<std::endl;
-            return cost;}
-    }*/
-
-    ROS_INFO("Cost = %f\r\n", cost);
-
-    return cost;
+    formation_cost_t retVal = {minCostTheta, minCost};
+    return retVal;
 }
-
-/*double dtheta(double theta)
-{
-    double d = 0;
-    for (int i = 0; i < ROBOT_NUM; i++)
-    {
-        double tmp = sqrt(polarTar[p[i]][0] * polarTar[p[i]][0] + polaradd[i][0] * polaradd[i][0] - 2 * polarTar[p[i]][0] * polaradd[i][0] * cos(polaradd[i][1] - (polarTar[p[i]][1] + theta)));
-        if (tmp == 0)
-            d += sqrt(polarTar[i][0] * polarTar[p[i]][0]);
-        else
-            d += 2 * polaradd[i][0] * polarTar[p[i]][0] * sin(theta + polarTar[p[i]][1] - polaradd[i][1]) / tmp;
-    }
-    return d;
-}*/
-
-/*double besttheta(double theta_ini)
-{
-
-    double r = 0.02;
-    double min = -3.14;
-    double max = 3.14;
-    double d = dtheta(theta_ini);;
-    while (max - min > 0.0002&&d>0.01)
-    {
-        d = dtheta(theta_ini);
-        if (d < 0)
-        {
-            if ( theta_ini - r * d < max)
-            {
-                min = theta_ini;
-                theta_ini = theta_ini - r * d;
-            }
-            else
-            {
-                theta_ini = theta_ini - r * d;
-                max = theta_ini + 6.28;
-                r = r * 0.99;
-            }
-        }
-        else
-        {
-            if ( theta_ini - r * d>min)
-            {
-                max = theta_ini;
-                theta_ini = theta_ini - r * d;
-            }
-            else
-            {
-                theta_ini = theta_ini - r * d;
-                max = theta_ini + 6.28;
-                r = r * 0.99;
-            }
-        }
-    }
-    return (min + max) / 2;
-}*/
 
 Eigen::VectorXd expectedX(ROBOT_NUM);
 Eigen::VectorXd expectedY(ROBOT_NUM);
@@ -202,13 +112,15 @@ void FormationChoose(){
 
     UpdateCenterPosition();
 
-    double formCostMin = targetCost(forms[0]);
+    formation_cost_t formCostMin = targetCost(forms[0]);
     int formCostMinIndex = 0;
     storeP();
 
     for(auto formIndex = 1; formIndex < FORM_NUM; formIndex++){
-        if(targetCost(forms[formIndex]) < formCostMin){
+        formation_cost_t formCost = targetCost(forms[formIndex]);
+        if(formCost.cost < formCostMin.cost){
             formCostMinIndex = formIndex;
+            formCostMin = formCost;
             storeP();
         }
     }
@@ -217,7 +129,7 @@ void FormationChoose(){
      * Todo: Rotation
      */
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
-        expectedX[robotIndex] = centerPosition[0](nowp[robotIndex]) + (*forms[formCostMinIndex][0])(nowp[robotIndex]);
-        expectedY[robotIndex] = centerPosition[1](nowp[robotIndex]) + (*forms[formCostMinIndex][1])(nowp[robotIndex]);
+        expectedX[robotIndex] = centerPosition[0](nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + sin(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
+        expectedY[robotIndex] = centerPosition[1](nowp[robotIndex]) - sin(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
     }
 }
