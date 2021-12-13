@@ -12,6 +12,7 @@
 #include "Position&Control.h"
 #include "Hungary.h"
 #include "Formation.h"
+#include "Obstacle.h"
 
 
 using namespace std;
@@ -55,16 +56,10 @@ int main(int argc, char** argv) {
     constexpr double k_v = 0.1;       // Scale of linear velocity
 
 
-
-
-
 //    std::cout <<"star_form_x" << star_form_x[0] << star_form_x[1] << star_form_x[2] << star_form_x[3] << star_form_x[4] << std::endl;
 //    std::cout <<"star_form_y" << star_form_y[0] << star_form_y[1] << star_form_y[2] << star_form_y[3] << star_form_y[4] << std::endl;
-
     Eigen::VectorXd d(ROBOT_NUM);
     Eigen::VectorXd d_(ROBOT_NUM);
-
-
 
 
     /* Convergence sign */
@@ -97,17 +92,13 @@ int main(int argc, char** argv) {
 
         judge_cnt = 0;
         for (int i = 0; i < ROBOT_NUM; i++){
-            if(/*std::fabs(del_theta(i)) < angle_th && */std::fabs(ControlGetY()(i)) < dis_th && std::fabs(ControlGetX()(i)) < dis_th){
+            if(std::fabs(ControlGetY()(i)) < dis_th && std::fabs(ControlGetX()(i)) < dis_th){
                 judge_cnt++;
-            }
-            else if(i == 2){
-                std::cout<<"del_x = "<<ControlGetX()(i)<<"; del_y = "<<ControlGetY()(i)<<std::endl;
             }
             if(judge_cnt == 5){
                 is_conv = true;
             }
         }
-
 
         /* Swarm robot move */
         for(int i = 0; i < ROBOT_NUM; i++) {
@@ -125,21 +116,7 @@ int main(int argc, char** argv) {
             //std::cout << 'w' << i << "= "  << w << std::endl;
 
             //avoid face to face crash
-            for(int j = 0; j < ROBOT_NUM; j++){
-                if(i == j){
-                    continue;
-                }
-                double face_angle = atan2((PositionGetY()(j) - PositionGetY()(i)), (PositionGetX()(j) - PositionGetX()(i))) - PositionGetTheta()(i);
-                double y_distance = std::fabs((PositionGetY()(j) - PositionGetY()(i)));
-                double x_distance = std::fabs((PositionGetX()(j) - PositionGetX()(i)));
-                double distance = sqrt(x_distance*x_distance + y_distance*y_distance);
-                //ROS_INFO_STREAM(i << " to " << j <<" face angle: " << face_angle << " y distance: " << y_distance);
-                //ROS_INFO_STREAM("this is test cpp file");
-                if (face_angle < 0.05/distance && face_angle < 0.1 && distance < 0.4){
-                    v = 0.3*v;
-                    w = w + 0.05*sqrt(ControlGetX()(i) * ControlGetX()(i) + ControlGetY()(i) * ControlGetY()(i)) / distance;
-                }
-            }
+            ObstacleAvoidance(v, w, i);
 
             //move the robot
             w = swarm_robot.checkVel(w, MAX_W, MIN_W);
@@ -153,6 +130,7 @@ int main(int argc, char** argv) {
         /* Get swarm robot poses */
         PositionRefresh(swarm_robot);
     }
+
 
     /* Stop all robots */
     swarm_robot.stopRobot();
