@@ -81,6 +81,13 @@ int main(int argc, char** argv) {
     /* While loop */
     while(! is_conv) {
 
+        static int cnt = 0;
+        cnt++;
+        if(cnt > 50){
+            cnt = 0;
+            FormationChoose();
+        }
+
         /* Judge whether reached */
         ControlTheta(-lap * PositionGetTheta());
         ControlY(-lap * (PositionGetY() - expectedY));

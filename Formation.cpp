@@ -29,19 +29,19 @@ constexpr int FORM_NUM = sizeof(forms) / sizeof(Eigen::VectorXd*) / 2;
 inline void InitFormationParas(){
     form_star_x << 0, 0.8, -0.8, 0, 0;
     form_star_y << 0, 0.8, -0.8, 0, 0;
-    form_circ_x << 0, 0.761,0.470, -0.470, -0.761;
-    form_circ_y << 0.8,0.247, -0.647, -0.470,0.247;
+    form_circ_x << 0, 0.761, 0.470, -0.470, -0.761;
+    form_circ_y << 0.8, 0.247, -0.647, -0.470, 0.247;
     form_thro_x << 0, 0.4, 0.4, 0.8, 0.8;
     form_thro_y << 0, 0.2, -0.2, 0.4, -0.4;
 }
 
-void map_init(Eigen::VectorXd *center, form_info_t formInfo){
+void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo){
     for(auto i = 0; i < ROBOT_NUM; i++) {
         for (auto j = 0; j < ROBOT_NUM; j++) {
             Map[i + 1][j + 1] = sqrt(   \
-                    (center[0](i) - (*formInfo[0])(j)) * (center[0](i) - (*formInfo[0])(j)) \
-                        + \
-                    (center[1](i) - (*formInfo[1])(j)) * (center[1](i) - (*formInfo[1])(j)) \
+                    (positionToCenter[0](i) - (*formInfo[0])(j)) * (positionToCenter[0](i) - (*formInfo[0])(j)) \
+ + \
+                    (positionToCenter[1](i) - (*formInfo[1])(j)) * (positionToCenter[1](i) - (*formInfo[1])(j)) \
                 );
         }
     }
@@ -205,7 +205,7 @@ void FormationChoose(){
     double formCostMin = targetCost(forms[0]);
     int formCostMinIndex = 0;
 
-    for(auto formIndex = 0; formIndex < FORM_NUM; formIndex++){
+    for(auto formIndex = 1; formIndex < FORM_NUM; formIndex++){
         if(targetCost(forms[formIndex]) < formCostMin){
             formCostMinIndex = formIndex;
             storeP();
