@@ -78,16 +78,13 @@ int main(int argc, char** argv) {
     PositionRefresh(swarm_robot);
     FormationChoose();
 
-    extern Eigen::VectorXd star_form_x;
-    extern Eigen::VectorXd star_form_y;
-
     /* While loop */
     while(! is_conv) {
 
         /* Judge whether reached */
         ControlTheta(-lap * PositionGetTheta());
-        ControlY(-lap * (PositionGetY() - star_form_y));
-        ControlX(-lap * (PositionGetX() - star_form_x));
+        ControlY(-lap * (PositionGetY() - expectedY));
+        ControlX(-lap * (PositionGetX() - expectedX));
         //std::cout << "cur_x" << "= " << cur_x << std::endl;
         //std::cout << "del_x" << "= " << del_x << std::endl;
 

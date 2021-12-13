@@ -8,84 +8,70 @@
 double Map[N][N]; //邻接矩阵存图
 
 
-double polarTar[ROBOT_NUM][2];
-double polaradd[ROBOT_NUM][2];
+/*double polarTar[ROBOT_NUM][2];
+double polaradd[ROBOT_NUM][2];*/
 
+Eigen::VectorXd form_star_x{{0, 0.8, -0.8, 0, 0}};
+Eigen::VectorXd form_star_y{{0, 0.8, -0.8, 0, 0}};
+Eigen::VectorXd form_circ_x{{0, 0.761,0.470, -0.470, -0.761}};
+Eigen::VectorXd form_circ_y{{0.8,0.247, -0.647, -0.470,0.247}};
+Eigen::VectorXd form_thro_x{{0, 0.4, 0.4, 0.8, 0.8}};
+Eigen::VectorXd form_thro_y{{0, 0.2, -0.2, 0.4, -0.4}};
 
-Eigen::VectorXd star_form_x(ROBOT_NUM);
-Eigen::VectorXd star_form_y(ROBOT_NUM);
+Eigen::VectorXd* forms[][2] = {
+        {&form_star_x, &form_star_y},
+        {&form_circ_x, &form_circ_y},
+        {&form_thro_x, &form_thro_y},
+};
 
-Eigen::VectorXd circ_form_x(ROBOT_NUM);
-Eigen::VectorXd circ_form_y(ROBOT_NUM);
-
-Eigen::VectorXd thro_form_x(ROBOT_NUM);
-Eigen::VectorXd thro_form_y(ROBOT_NUM);
-
+constexpr int FORM_NUM = sizeof(forms) / sizeof(Eigen::VectorXd*) / 2;
 
 inline void InitFormationParas(){
-    star_form_x << 0, 0.8, -0.8, 0, 0;
-    star_form_y << 0, 0, 0, 0.8, -0.8;
-    circ_form_x << 0, 0.761,0.470, -0.470, -0.761;
-    circ_form_y << 0.8,0.247, -0.647, -0.470,0.247;
-    thro_form_x << 0, 0.4, 0.4, 0.8, 0.8;
-    thro_form_y << 0, 0.2, -0.2, 0.4, -0.4;
+
 }
 
-void map_init(double target[][2], double addr[][2], double theta)
-{
-    for (int i = 0; i < ROBOT_NUM; i++)
-    {
-        polarTar[i][0] = sqrt(target[i][0] * target[i][0] + target[i][1] * target[i][1]);
-        polarTar[i][1] = atan2(target[i][1], target[i][0]);
-        polaradd[i][0] = sqrt(addr[i][0] * addr[i][0] + addr[i][1] * addr[i][1]);
-        polaradd[i][1] = atan2(addr[i][1], addr[i][0]);
-    }
-
-    for (int i = 0; i < ROBOT_NUM; i++)
-        for (int j = 0; j < ROBOT_NUM; j++)
-        {
-            Map[i + 1][j + 1] = sqrt(polarTar[j][0] * polarTar[j][0] + polaradd[i][0] * polaradd[i][0] - 2 * polarTar[j][0] * polaradd[i][0] * cos(polaradd[i][1] - (polarTar[j][1] + theta)));
+void map_init(Eigen::VectorXd *center, form_info_t formInfo){
+    for(auto i = 0; i < ROBOT_NUM; i++) {
+        for (auto j = 0; j < ROBOT_NUM; j++) {
+            Map[i + 1][j + 1] = sqrt(   \
+                    (center[0](i) - (*formInfo[0])(i)) * (center[0](i) - (*formInfo[0])(i)) \
+                        + \
+                    (center[1](i) - (*formInfo[1])(i)) * (center[1](i) - (*formInfo[1])(i)) \
+                )
         }
+    }
 }
 
-double besttheta(double theta_ini);
+//double besttheta(double theta_ini);
 
-double targetCost(double target[][2], double addr[][2])
+Eigen::VectorXd centorPosition[2];
+Eigen::VectorXd positionToCenter[2];
+
+void UpdateCenterPosition() {
+    /**
+     * 减少IO次数，借用两个变量临时存储
+     */
+    positionToCenter[0] = PositionGetX();
+    positionToCenter[1] = PositionGetY();
+
+    centorPosition[0] = centorPosition[0].setOnes(ROBOT_NUM) * (positionToCenter[0].sum() / ROBOT_NUM);
+    centorPosition[1] = centorPosition[1].setOnes(ROBOT_NUM) * (positionToCenter[1].sum() / ROBOT_NUM);
+    positionToCenter[0] -= centorPosition[0];
+    positionToCenter[1] -= centorPosition[1];
+}
+
+double targetCost(form_info_t formInfo)
 {
+//    double theta = 0;
 
-    double centerX[2] = {0,0};
-    double centerY[2] = {0,0};
-    for (int i = 0; i < ROBOT_NUM; i++)
-    {
-        centerX[0] += addr[i][0];
-        centerY[0] += addr[i][1];
-        centerX[1] += target[i][0];
-        centerY[1] += target[i][1];
-    }
+    map_init(positionToCenter, formInfo);
 
-    centerX[0] /= ROBOT_NUM;
-    centerY[0] /= ROBOT_NUM;
-    centerX[1] /= ROBOT_NUM;
-    centerY[1] /= ROBOT_NUM;
-
-    for (int i = 0; i < ROBOT_NUM; i++)
-    {
-        addr[i][0] -= centerX[0];
-        addr[i][1] -= centerY[0];
-        target[i][0] -= centerX[1];
-        target[i][1] -= centerY[1];
-    }
-    double theta = 0;
-    double cost = 0;
-
-    map_init(target, addr, theta);
-
-    cost = calc(Map, ROBOT_NUM);
+    double cost = calc(Map, ROBOT_NUM);
     storeP();
 
-    for (int i = -20; i < 20; i++)
+/*    for (int i = -20; i < 20; i++)
     {
-        map_init(target, addr, 3.14 * i / 20);
+        map_init(position);
 
         double tmp  = calc(Map, ROBOT_NUM);
         std::cout<<tmp<<" ";
@@ -97,19 +83,19 @@ double targetCost(double target[][2], double addr[][2])
             storeP();
         }
 
-    }
+    }*/
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < ROBOT_NUM; i++)
     {
         std::cout << nowp[i] << " ";
     }
 
-    std::cout << std::endl;
+    /*std::cout << std::endl;
     double cost2;
-    while (1)
+    while (true)
     {
         double thetanew = besttheta(theta);
-        map_init(target, addr, thetanew);
+        map_init();
         cost2 = calc(Map, ROBOT_NUM);
         if (cost2 < cost)
         {
@@ -132,10 +118,12 @@ double targetCost(double target[][2], double addr[][2])
 
             std::cout<<theta<<std::endl;
             return cost;}
-    }
+    }*/
+
+    return cost;
 }
 
-double dtheta(double theta)
+/*double dtheta(double theta)
 {
     double d = 0;
     for (int i = 0; i < ROBOT_NUM; i++)
@@ -147,9 +135,9 @@ double dtheta(double theta)
             d += 2 * polaradd[i][0] * polarTar[p[i]][0] * sin(theta + polarTar[p[i]][1] - polaradd[i][1]) / tmp;
     }
     return d;
-}
+}*/
 
-double besttheta(double theta_ini)
+/*double besttheta(double theta_ini)
 {
 
     double r = 0.02;
@@ -189,64 +177,32 @@ double besttheta(double theta_ini)
         }
     }
     return (min + max) / 2;
-}
+}*/
 
-double sstarget[5][2];
-double ssadd[5][2];
+Eigen::VectorXd expectedX(ROBOT_NUM);
+Eigen::VectorXd expectedY(ROBOT_NUM);
 
 void FormationChoose(){
 
     InitFormationParas();
 
-    double star_cost,circ_cost,thro_cost;
+    UpdateCenterPosition();
 
-    for(int i = 0; i < 5; i++) {
-        ssadd[i][0]= GetCurrentPose()[i][0];
-        ssadd[i][1] = GetCurrentPose()[i][1];
-        sstarget[i][0] = star_form_x(i);
-        sstarget[i][1] = star_form_y(i);
-    }
-    star_cost = targetCost(sstarget, ssadd);
-    for(int i = 0; i <5; i++) {
-        star_form_x(i) = sstarget[nowp[i]][0];
-        star_form_y(i) = sstarget[nowp[i]][1];
-    }
+    double formCostMin = targetCost(forms[0]);
+    int formCostMinIndex = 0;
 
-
-    for(int i = 0; i < 5; i++) {
-        sstarget[i][0] = circ_form_x(i);
-        sstarget[i][1] = circ_form_y(i);
-    }
-    circ_cost=targetCost(sstarget, ssadd);
-    for(int i = 0; i <5; i++) {
-        circ_form_x(i) = sstarget[nowp[i]][0];
-        circ_form_y(i) = sstarget[nowp[i]][1];
-    }
-
-
-    for(int i = 0; i < 5; i++) {
-        sstarget[i][0] = thro_form_x(i);
-        sstarget[i][1] = thro_form_y(i);
-    }
-    thro_cost=targetCost(sstarget, ssadd);
-    for(int i = 0; i <5; i++) {
-        thro_form_x(i) = sstarget[nowp[i]][0];
-        thro_form_y(i) = sstarget[nowp[i]][1];
-    }
-
-
-
-    if(thro_cost<star_cost&&thro_cost<circ_cost)
-        for(int i = 0; i <5; i++) {
-            star_form_x=thro_form_x;
-            star_form_y = thro_form_y;
+    for(auto formIndex = 0; formIndex < FORM_NUM; formIndex++){
+        if(targetCost(forms[formIndex]) < formCostMin){
+            formCostMinIndex = formIndex;
+            storeP();
         }
+    }
 
-    if(circ_cost<star_cost&&circ_cost<thro_cost)
-        for(int i = 0; i <5; i++) {
-            star_form_x=circ_form_x;
-            star_form_y = circ_form_y;
-        }
-
+    /**
+     * Todo: Rotation
+     */
+    for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
+        expectedX[robotIndex] = positionToCenter[0](nowp[robotIndex]);
+        expectedY[robotIndex] = positionToCenter[1](nowp[robotIndex]);
+    }
 }
-

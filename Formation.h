@@ -12,7 +12,12 @@
 #include "Params.h"
 #include "Position&Control.h"
 
+typedef Eigen::VectorXd* (*form_info_t)[2];
+
+extern Eigen::VectorXd expectedX;
+extern Eigen::VectorXd expectedY;
+
 void FormationChoose();
-double targetCost(double target[][2], double addr[][2]);
+double targetCost(form_info_t);
 
 #endif //SRC_FORMATION_H
