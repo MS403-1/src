@@ -7,14 +7,17 @@
 extern std::vector<int> swarm_robot_id;
 
 /* Mobile robot poses and for next poses */
-Eigen::VectorXd cur_x(swarm_robot_id.size());
-Eigen::VectorXd cur_y(swarm_robot_id.size());
-Eigen::VectorXd cur_theta(swarm_robot_id.size());
-Eigen::VectorXd del_x(swarm_robot_id.size());
-Eigen::VectorXd del_y(swarm_robot_id.size());
-Eigen::VectorXd del_theta(swarm_robot_id.size());
+Eigen::VectorXd cur_x(ROBOT_NUM);
+Eigen::VectorXd cur_y(ROBOT_NUM);
+Eigen::VectorXd cur_theta(ROBOT_NUM);
+Eigen::VectorXd del_x(ROBOT_NUM);
+Eigen::VectorXd del_y(ROBOT_NUM);
+Eigen::VectorXd del_theta(ROBOT_NUM);
 
-std::vector<std::vector<double>> current_robot_pose(swarm_robot_id.size());
+/**
+ * Warning: The following vector is assigned with static memory size, this may cause exception when index is over ROBOT_NUM
+ */
+std::vector<std::vector<double>> current_robot_pose(ROBOT_NUM);
 
 extern SwarmRobot swarm_robot;
 

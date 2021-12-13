@@ -8,6 +8,8 @@
 #include <vector>
 #include <swarm_robot_control.h>
 
+#include "Params.h"
+
 void PositionRefresh(SwarmRobot& swarm_robot);
 
 Eigen::VectorXd& PositionGetX();
