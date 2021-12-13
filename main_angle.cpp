@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
 
         static int cnt = 0;
         cnt++;
-        if(cnt > 100){
+        if(cnt > 10){
             cnt = 0;
             FormationChoose();
         }
