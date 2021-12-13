@@ -12,7 +12,7 @@
 #include "Params.h"
 #include "Position&Control.h"
 
-typedef Eigen::VectorXd* (*form_info_t)[2];
+typedef Eigen::VectorXd* (form_info_t)[2];
 
 extern Eigen::VectorXd expectedX;
 extern Eigen::VectorXd expectedY;

@@ -11,12 +11,12 @@ double Map[N][N]; //邻接矩阵存图
 /*double polarTar[ROBOT_NUM][2];
 double polaradd[ROBOT_NUM][2];*/
 
-Eigen::VectorXd form_star_x{{0, 0.8, -0.8, 0, 0}};
-Eigen::VectorXd form_star_y{{0, 0.8, -0.8, 0, 0}};
-Eigen::VectorXd form_circ_x{{0, 0.761,0.470, -0.470, -0.761}};
-Eigen::VectorXd form_circ_y{{0.8,0.247, -0.647, -0.470,0.247}};
-Eigen::VectorXd form_thro_x{{0, 0.4, 0.4, 0.8, 0.8}};
-Eigen::VectorXd form_thro_y{{0, 0.2, -0.2, 0.4, -0.4}};
+Eigen::VectorXd form_star_x(ROBOT_NUM);
+Eigen::VectorXd form_star_y(ROBOT_NUM);
+Eigen::VectorXd form_circ_x(ROBOT_NUM);
+Eigen::VectorXd form_circ_y(ROBOT_NUM);
+Eigen::VectorXd form_thro_x(ROBOT_NUM);
+Eigen::VectorXd form_thro_y(ROBOT_NUM);
 
 Eigen::VectorXd* forms[][2] = {
         {&form_star_x, &form_star_y},
@@ -27,7 +27,12 @@ Eigen::VectorXd* forms[][2] = {
 constexpr int FORM_NUM = sizeof(forms) / sizeof(Eigen::VectorXd*) / 2;
 
 inline void InitFormationParas(){
-
+    form_star_x << 0, 0.8, -0.8, 0, 0;
+    form_star_y << 0, 0.8, -0.8, 0, 0;
+    form_circ_x << 0, 0.761,0.470, -0.470, -0.761;
+    form_circ_y << 0.8,0.247, -0.647, -0.470,0.247;
+    form_thro_x << 0, 0.4, 0.4, 0.8, 0.8;
+    form_thro_y << 0, 0.2, -0.2, 0.4, -0.4;
 }
 
 void map_init(Eigen::VectorXd *center, form_info_t formInfo){
@@ -37,8 +42,15 @@ void map_init(Eigen::VectorXd *center, form_info_t formInfo){
                     (center[0](i) - (*formInfo[0])(i)) * (center[0](i) - (*formInfo[0])(i)) \
                         + \
                     (center[1](i) - (*formInfo[1])(i)) * (center[1](i) - (*formInfo[1])(i)) \
-                )
+                );
         }
+    }
+
+    for(auto i = 0; i < ROBOT_NUM; i++){
+        for(auto j = 0; j < ROBOT_NUM; j++){
+            ROS_INFO("%f ", Map[i + 1][j + 1]);
+        }
+        ROS_INFO("\r\n");
     }
 }
 
@@ -119,6 +131,8 @@ double targetCost(form_info_t formInfo)
             std::cout<<theta<<std::endl;
             return cost;}
     }*/
+
+    ROS_INFO("Cost = %f\r\n", cost);
 
     return cost;
 }
@@ -202,7 +216,7 @@ void FormationChoose(){
      * Todo: Rotation
      */
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
-        expectedX[robotIndex] = positionToCenter[0](nowp[robotIndex]);
-        expectedY[robotIndex] = positionToCenter[1](nowp[robotIndex]);
+        expectedX[robotIndex] = centorPosition[0](nowp[robotIndex]) + (*forms[formCostMinIndex][0])(nowp[robotIndex]);
+        expectedY[robotIndex] = centorPosition[1](nowp[robotIndex]) + (*forms[formCostMinIndex][1])(nowp[robotIndex]);
     }
 }
