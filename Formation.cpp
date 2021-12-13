@@ -35,7 +35,7 @@ inline void InitFormationParas(){
     form_thro_y << 0, 0.2, -0.2, 0.4, -0.4;
 }
 
-void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo){
+void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo, double theta) {
     for(auto i = 0; i < ROBOT_NUM; i++) {
         for (auto j = 0; j < ROBOT_NUM; j++) {
             Map[i + 1][j + 1] = sqrt(   \
@@ -54,8 +54,6 @@ void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo){
     }
 }
 
-//double besttheta(double theta_ini);
-
 Eigen::VectorXd centerPosition[2];
 Eigen::VectorXd positionToCenter[2];
 
@@ -72,126 +70,16 @@ void UpdateCenterPosition() {
     positionToCenter[1] -= centerPosition[1];
 }
 
-double targetCost(form_info_t formInfo)
+formation_cost_t targetCost(Eigen::VectorXd *formInfo[2])
 {
-//    double theta = 0;
-
-    map_init(positionToCenter, formInfo);
+    map_init(positionToCenter, formInfo, 0);
 
     double cost = calc(Map, ROBOT_NUM);
-//    storeP();
-
-/*    for (int i = -20; i < 20; i++)
-    {
-        map_init(position);
-
-        double tmp  = calc(Map, ROBOT_NUM);
-        std::cout<<tmp<<" ";
-        if (tmp < cost)
-        {
-            cost = tmp;
-            theta = 3.14 * i / 20;
-
-            storeP();
-        }
-
-    }*/
-
-    for (int i = 0; i < ROBOT_NUM; i++)
-    {
-        std::cout << nowp[i] << " ";
-    }
-
-    /*std::cout << std::endl;
-    double cost2;
-    while (true)
-    {
-        double thetanew = besttheta(theta);
-        map_init();
-        cost2 = calc(Map, ROBOT_NUM);
-        if (cost2 < cost)
-        {
-            theta=thetanew;
-            storeP();
-            cost = cost2;
-        }
-        else{
-            for(int i=0;i<5;i++)
-                std::cout<<target[i][0]<<" "<<target[i][1]<<std::endl;
-            for (int i = 0; i < 5; i++)
-            {
-                std::cout << nowp[i] << " ";
-
-                double a=cos(theta)*target[i][0]-sin(theta)*target[i][1];
-                double b=sin(theta)*target[i][0]+cos(theta)*target[i][1];
-                target[i][0]=a;
-                target[i][1]=b;
-            }
-
-            std::cout<<theta<<std::endl;
-            return cost;}
-    }*/
-
     ROS_INFO("Cost = %f\r\n", cost);
 
-    return cost;
+    formation_cost_t retVal = {0, cost};
+    return retVal;
 }
-
-/*double dtheta(double theta)
-{
-    double d = 0;
-    for (int i = 0; i < ROBOT_NUM; i++)
-    {
-        double tmp = sqrt(polarTar[p[i]][0] * polarTar[p[i]][0] + polaradd[i][0] * polaradd[i][0] - 2 * polarTar[p[i]][0] * polaradd[i][0] * cos(polaradd[i][1] - (polarTar[p[i]][1] + theta)));
-        if (tmp == 0)
-            d += sqrt(polarTar[i][0] * polarTar[p[i]][0]);
-        else
-            d += 2 * polaradd[i][0] * polarTar[p[i]][0] * sin(theta + polarTar[p[i]][1] - polaradd[i][1]) / tmp;
-    }
-    return d;
-}*/
-
-/*double besttheta(double theta_ini)
-{
-
-    double r = 0.02;
-    double min = -3.14;
-    double max = 3.14;
-    double d = dtheta(theta_ini);;
-    while (max - min > 0.0002&&d>0.01)
-    {
-        d = dtheta(theta_ini);
-        if (d < 0)
-        {
-            if ( theta_ini - r * d < max)
-            {
-                min = theta_ini;
-                theta_ini = theta_ini - r * d;
-            }
-            else
-            {
-                theta_ini = theta_ini - r * d;
-                max = theta_ini + 6.28;
-                r = r * 0.99;
-            }
-        }
-        else
-        {
-            if ( theta_ini - r * d>min)
-            {
-                max = theta_ini;
-                theta_ini = theta_ini - r * d;
-            }
-            else
-            {
-                theta_ini = theta_ini - r * d;
-                max = theta_ini + 6.28;
-                r = r * 0.99;
-            }
-        }
-    }
-    return (min + max) / 2;
-}*/
 
 Eigen::VectorXd expectedX(ROBOT_NUM);
 Eigen::VectorXd expectedY(ROBOT_NUM);
@@ -202,12 +90,12 @@ void FormationChoose(){
 
     UpdateCenterPosition();
 
-    double formCostMin = targetCost(forms[0]);
+    double formCostMin = targetCost(forms[0]).cost;
     int formCostMinIndex = 0;
     storeP();
 
     for(auto formIndex = 1; formIndex < FORM_NUM; formIndex++){
-        if(targetCost(forms[formIndex]) < formCostMin){
+        if(targetCost(forms[formIndex]).cost < formCostMin){
             formCostMinIndex = formIndex;
             storeP();
         }
