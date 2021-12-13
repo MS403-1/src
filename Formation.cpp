@@ -39,9 +39,9 @@ void map_init(Eigen::VectorXd *center, form_info_t formInfo){
     for(auto i = 0; i < ROBOT_NUM; i++) {
         for (auto j = 0; j < ROBOT_NUM; j++) {
             Map[i + 1][j + 1] = sqrt(   \
-                    (center[0](i) - (*formInfo[0])(i)) * (center[0](i) - (*formInfo[0])(i)) \
+                    (center[0](i) - (*formInfo[0])(j)) * (center[0](i) - (*formInfo[0])(j)) \
                         + \
-                    (center[1](i) - (*formInfo[1])(i)) * (center[1](i) - (*formInfo[1])(i)) \
+                    (center[1](i) - (*formInfo[1])(j)) * (center[1](i) - (*formInfo[1])(j)) \
                 );
         }
     }
@@ -79,7 +79,7 @@ double targetCost(form_info_t formInfo)
     map_init(positionToCenter, formInfo);
 
     double cost = calc(Map, ROBOT_NUM);
-    storeP();
+//    storeP();
 
 /*    for (int i = -20; i < 20; i++)
     {
