@@ -40,7 +40,7 @@ void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo){
         for (auto j = 0; j < ROBOT_NUM; j++) {
             Map[i + 1][j + 1] = sqrt(   \
                     (positionToCenter[0](i) - (*formInfo[0])(j)) * (positionToCenter[0](i) - (*formInfo[0])(j)) \
- + \
+                        + \
                     (positionToCenter[1](i) - (*formInfo[1])(j)) * (positionToCenter[1](i) - (*formInfo[1])(j)) \
                 );
         }
@@ -56,7 +56,7 @@ void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo){
 
 //double besttheta(double theta_ini);
 
-Eigen::VectorXd centorPosition[2];
+Eigen::VectorXd centerPosition[2];
 Eigen::VectorXd positionToCenter[2];
 
 void UpdateCenterPosition() {
@@ -66,10 +66,10 @@ void UpdateCenterPosition() {
     positionToCenter[0] = PositionGetX();
     positionToCenter[1] = PositionGetY();
 
-    centorPosition[0] = centorPosition[0].setOnes(ROBOT_NUM) * (positionToCenter[0].sum() / ROBOT_NUM);
-    centorPosition[1] = centorPosition[1].setOnes(ROBOT_NUM) * (positionToCenter[1].sum() / ROBOT_NUM);
-    positionToCenter[0] -= centorPosition[0];
-    positionToCenter[1] -= centorPosition[1];
+    centerPosition[0] = centerPosition[0].setOnes(ROBOT_NUM) * (positionToCenter[0].sum() / ROBOT_NUM);
+    centerPosition[1] = centerPosition[1].setOnes(ROBOT_NUM) * (positionToCenter[1].sum() / ROBOT_NUM);
+    positionToCenter[0] -= centerPosition[0];
+    positionToCenter[1] -= centerPosition[1];
 }
 
 double targetCost(form_info_t formInfo)
@@ -204,6 +204,7 @@ void FormationChoose(){
 
     double formCostMin = targetCost(forms[0]);
     int formCostMinIndex = 0;
+    storeP();
 
     for(auto formIndex = 1; formIndex < FORM_NUM; formIndex++){
         if(targetCost(forms[formIndex]) < formCostMin){
@@ -216,7 +217,7 @@ void FormationChoose(){
      * Todo: Rotation
      */
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
-        expectedX[robotIndex] = centorPosition[0](nowp[robotIndex]) + (*forms[formCostMinIndex][0])(nowp[robotIndex]);
-        expectedY[robotIndex] = centorPosition[1](nowp[robotIndex]) + (*forms[formCostMinIndex][1])(nowp[robotIndex]);
+        expectedX[robotIndex] = centerPosition[0](nowp[robotIndex]) + (*forms[formCostMinIndex][0])(nowp[robotIndex]);
+        expectedY[robotIndex] = centerPosition[1](nowp[robotIndex]) + (*forms[formCostMinIndex][1])(nowp[robotIndex]);
     }
 }
