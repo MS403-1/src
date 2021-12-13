@@ -28,11 +28,11 @@ constexpr int FORM_NUM = sizeof(forms) / sizeof(Eigen::VectorXd*) / 2;
 
 inline void InitFormationParas(){
     form_star_x << 0, 0.8, -0.8, 0, 0;
-    form_star_y << 0, 0.8, -0.8, 0, 0;
+    form_star_y << 0, 0, 0, 0.8, -0.8;
     form_circ_x << 0, 0.761, 0.470, -0.470, -0.761;
     form_circ_y << 0.8, 0.247, -0.647, -0.470, 0.247;
-    form_thro_x << 0, 0.4, 0.4, 0.8, 0.8;
-    form_thro_y << 0, 0.2, -0.2, 0.4, -0.4;
+    form_thro_x << 0, 0.6, 0.6, 1.2, 1.2;
+    form_thro_y << 0, 0.3, -0.3, 0.6, -0.6;
 }
 
 void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo, double theta) {
