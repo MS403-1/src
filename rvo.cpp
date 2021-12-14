@@ -19,8 +19,8 @@ bool testAllow(double targetw, double v0, double w0, double v1, double w1, doubl
     double dw = atan(2 * robotR / sqrt(y * y + x * x));
     if (!staticobj)
     {
-        double vx = v0 * cos(w1) - v1 * cos(w1);
-        double vy = v0 * sin(w1) - v1 * sin(w1);
+        double vx = v0 * cos(w1) + v1 * cos(w1);
+        double vy = v0 * sin(w1) + v1 * sin(w1);
         double tarx = v0 * cos(targetw);
         double tary = v0 * sin(targetw);
         targetw = atan2(tary - vy / 2, tarx - vx / 2);
@@ -85,6 +85,7 @@ bool rvo_solve()
             if (moveStop[i])
             {
                 swarmOmegaout[i] = -swarmOmegaout[i];
+                swarmVelocity[i]=0;
             }
             else
                 for (count = 0; count < 75; count++)
