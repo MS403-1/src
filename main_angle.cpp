@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
         cnt++;
         if(cnt > 10){
             cnt = 0;
-            FormationChoose();
+            FormationChoose(0, 0);
         }
 
         /* Judge whether reached */
@@ -116,7 +116,7 @@ int main(int argc, char** argv) {
             //std::cout << 'w' << i << "= "  << w << std::endl;
 
             //avoid face to face crash
-            ObstacleAvoidance(v, w, i);
+            //ObstacleAvoidance(v, w, i);
 
             //move the robot
             w = swarm_robot.checkVel(w, MAX_W, MIN_W);
