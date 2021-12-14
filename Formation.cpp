@@ -109,7 +109,6 @@ Eigen::VectorXd expectedY(ROBOT_NUM);
 void FormationChoose(){
 
     InitFormationParas();
-
     UpdateCenterPosition();
 
     formation_cost_t formCostMin = targetCost(forms[0]);
@@ -125,11 +124,28 @@ void FormationChoose(){
         }
     }
 
-    /**
-     * Todo: Rotation
-     */
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
         expectedX[robotIndex] = centerPosition[0](nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + sin(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
         expectedY[robotIndex] = centerPosition[1](nowp[robotIndex]) - sin(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
     }
+}
+
+void FormationChoose(int formationIndex){
+
+    InitFormationParas();
+    UpdateCenterPosition();
+
+    formation_cost_t formCostMin = targetCost(forms[formationIndex]);
+    storeP();
+
+    for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
+        expectedX[robotIndex] = centerPosition[0](nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + sin(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
+        expectedY[robotIndex] = centerPosition[1](nowp[robotIndex]) - sin(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
+    }
+}
+
+void FormationChoose(int formationIndex, double theta){
+    map_init(positionToCenter, forms[formationIndex], theta);
+    calc(Map, ROBOT_NUM);
+    storeP();
 }
