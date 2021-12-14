@@ -7,6 +7,12 @@
 
 constexpr int M = 11;
 constexpr int N = 11;
-constexpr int ROBOT_NUM = 5;
+
+/* First: Set ids of swarm robot based on Aruco marker */
+constexpr int swarm_robot_id[] = {1, 2, 3, 4, 5};
+constexpr int obstacle_id[] = {};
+
+constexpr int ROBOT_NUM = sizeof(swarm_robot_id) / sizeof(int);
+constexpr int OBSTACLE_NUM = sizeof(obstacle_id) / sizeof(int);
 
 #endif //SRC_PARAMS_H

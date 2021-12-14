@@ -7,20 +7,12 @@
 #include <cmath>
 #include <iostream>
 
-//double arctan(double y, double x);
-
 #include "Position&Control.h"
 #include "Hungary.h"
 #include "Formation.h"
 #include "Obstacle.h"
 
-
 using namespace std;
-
-
-
-/* First: Set ids of swarm robot based on Aruco marker */
-std::vector<int> swarm_robot_id{1, 2, 3, 4, 5};
 
 /* Main function */
 int main(int argc, char** argv) {
@@ -29,8 +21,16 @@ int main(int argc, char** argv) {
 
     ros::NodeHandle nh;
 
+    std::vector<int> agent_id(ROBOT_NUM + OBSTACLE_NUM);
+    for(auto it : swarm_robot_id){
+        agent_id.push_back(it);
+    }
+    for(auto it : obstacle_id){
+        agent_id.push_back(it);
+    }
+
     /* Initialize swarm robot */
-    SwarmRobot swarm_robot(&nh, swarm_robot_id);
+    SwarmRobot swarm_robot(&nh, agent_id);
 
     /* Set L Matrix */
     Eigen::MatrixXd lap(ROBOT_NUM, ROBOT_NUM);
@@ -39,6 +39,13 @@ int main(int argc, char** argv) {
             -1, -1, 4, -1, -1,
             -1, -1, -1, 4, -1,
             -1, -1, -1, -1, 4;
+
+/*    lap <<  5, -1, -1, -1, -1, -1,
+            -1, 5, -1, -1, -1, -1,
+            -1, -1, 5, -1, -1, -1,
+            -1, -1, -1, 5, -1, -1,
+            -1, -1, -1, -1, 5, -1,
+            -1, -1, -1, -1, -1, 5;*/
 
 
     /* Convergence threshold */

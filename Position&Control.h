@@ -20,6 +20,10 @@ Eigen::VectorXd& ControlGetX();
 Eigen::VectorXd& ControlGetY();
 Eigen::VectorXd& ControlGetTheta();
 
+Eigen::VectorXd& ObstacleGetX();
+Eigen::VectorXd& ObstacleGetY();
+Eigen::VectorXd& ObstacleGetTheta();
+
 void ControlX(const Eigen::VectorXd& vx);
 void ControlY(const Eigen::VectorXd& vy);
 void ControlTheta(const Eigen::VectorXd& w);
