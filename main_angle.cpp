@@ -111,19 +111,26 @@ int main(int argc, char** argv) {
             double v_x = ControlGetX()(i) * k_v;
             double v_y = ControlGetY()(i) * k_v;
             double v_direction = atan2(v_y, v_x);
-            double dire_w = v_direction - PositionGetTheta()(i);
-            double v = sqrt(v_x*v_x + v_y*v_y) * cos(dire_w);
+
+            d(i)=sqrt(v_x*v_x + v_y*v_y);
+            d_(i)=v_direction;
+
+            //std::cout << 'w' << i << "= "  << w << std::endl;
+        }
+            //avoid face to face crash
+            //ObstacleAvoidance(v, w, i);
+            RVO(PositionGetX(),PositionGetY(),d, d_);
+            VO(ObstacleGetX(),ObstacleGetY(),PositionGetX(),PositionGetY(),d, d_);
+            //move the robot
+
+        for(int i = 0; i < ROBOT_NUM; i++) {
+            double dire_w = d_(i) - PositionGetTheta()(i);
+            double v = d(i) * cos(dire_w);
             //std::cout << 'v' << i << "= " << v << std::endl;
 
             //determine the omega
             //if (i==1){std::cout<<"vx = "<<v_x<<"; vy = "<<v_y<<"; dire_w = "<<dire_w<<"; cur_theta = "<<cur_theta(i)<<"; v_direction = "<<v_direction<<std::endl;}
             double w = (20*sqrt(v_x*v_x + v_y*v_y)*dire_w)*k_w;
-            //std::cout << 'w' << i << "= "  << w << std::endl;
-
-            //avoid face to face crash
-            //ObstacleAvoidance(v, w, i);
-
-            //move the robot
             w = swarm_robot.checkVel(w, MAX_W, MIN_W);
             v = swarm_robot.checkVel(v, MAX_V, MIN_V);
             swarm_robot.moveRobot(i, v, w);
