@@ -83,22 +83,17 @@ int main(int argc, char** argv) {
 //    bool is_shaped = false;    // Convergence sign of shape
 //    bool is_conv = false;      // Convergence sign of agents
 
-    double theta_sum;
-
-    PositionRefresh(swarm_robot);
-    FormationChooseDirect(0);
-
     /* While loop */
     while(true) {
 
         /* Get swarm robot poses */
         PositionRefresh(swarm_robot);
 
-        static int cnt = 0;
+        static int cnt = 10;
         cnt++;
         if(cnt > 10){
             cnt = 0;
-            FormationChoose(0, 0);
+            FormationChooseDirect(0);
         }
 
         /* Judge whether reached */
