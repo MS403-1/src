@@ -14,13 +14,41 @@
 
 using namespace std;
 
+/* Convergence threshold */
+constexpr double conv_th = 0.2;   // Threshold of angle, in rad
+constexpr double dis_th = 0.05;    // Threshold of distance, in m
+constexpr double angle_th = 0.05;  // Threshold of angle, in rad
+
+/* Velocity scale and threshold */
+constexpr double MAX_W = 1;       // Maximum angle velocity (rad/s)
+constexpr double MIN_W = 0.05;    // Minimum angle velocity(rad/s)
+constexpr double MAX_V = 0.2;     // Maximum linear velocity(m/s)
+constexpr double MIN_V = 0.01;    // Minimum linear velocity(m/s)
+constexpr double k_w = 0.12;       // Scale of angle velocity
+constexpr double k_v = 0.1;       // Scale of linear velocity
+
+bool StopCondition() {
+    static int judge_cnt = 0;
+    for (int i = 0; i < ROBOT_NUM; i++) {
+        if (std::fabs(ControlGetY()(i)) < dis_th && std::fabs(ControlGetX()(i)) < dis_th) {
+            judge_cnt++;
+        }
+        if (judge_cnt == 5) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /* Main function */
 int main(int argc, char** argv) {
 
     ros::init(argc, argv, "swarm_robot_control_formation");
-
     ros::NodeHandle nh;
 
+    /**
+     * April detection initialization
+     */
     std::vector<int> agent_id(ROBOT_NUM + OBSTACLE_NUM);
     for(auto it : swarm_robot_id){
         agent_id.push_back(it);
@@ -47,41 +75,24 @@ int main(int argc, char** argv) {
             -1, -1, -1, -1, 5, -1,
             -1, -1, -1, -1, -1, 5;*/
 
-
-    /* Convergence threshold */
-    constexpr double conv_th = 0.2;   // Threshold of angle, in rad
-    constexpr double dis_th = 0.05;    // Threshold of distance, in m
-    constexpr double angle_th = 0.05;  // Threshold of angle, in rad
-
-
-    /* Velocity scale and threshold */
-    constexpr double MAX_W = 1;       // Maximum angle velocity (rad/s)
-    constexpr double MIN_W = 0.05;    // Minimum angle velocity(rad/s)
-    constexpr double MAX_V = 0.2;     // Maximum linear velocity(m/s)
-    constexpr double MIN_V = 0.01;    // Minimum linear velocity(m/s)
-    constexpr double k_w = 0.12;       // Scale of angle velocity
-    constexpr double k_v = 0.1;       // Scale of linear velocity
-
-
-//    std::cout <<"star_form_x" << star_form_x[0] << star_form_x[1] << star_form_x[2] << star_form_x[3] << star_form_x[4] << std::endl;
-//    std::cout <<"star_form_y" << star_form_y[0] << star_form_y[1] << star_form_y[2] << star_form_y[3] << star_form_y[4] << std::endl;
     Eigen::VectorXd d(ROBOT_NUM);
     Eigen::VectorXd d_(ROBOT_NUM);
 
-
     /* Convergence sign */
-    bool is_angled = false;    // Convergence sign of angle
-    bool is_shaped = false;    // Convergence sign of shape
-    bool is_conv = false;      // Convergence sign of agents
+//    bool is_angled = false;    // Convergence sign of angle
+//    bool is_shaped = false;    // Convergence sign of shape
+//    bool is_conv = false;      // Convergence sign of agents
 
     double theta_sum;
-    int judge_cnt = 0;
 
     PositionRefresh(swarm_robot);
-    FormationChoose();
+    FormationChooseDirect(0);
 
     /* While loop */
-    while(! is_conv) {
+    while(true) {
+
+        /* Get swarm robot poses */
+        PositionRefresh(swarm_robot);
 
         static int cnt = 0;
         cnt++;
@@ -97,15 +108,7 @@ int main(int argc, char** argv) {
         //std::cout << "cur_x" << "= " << cur_x << std::endl;
         //std::cout << "del_x" << "= " << del_x << std::endl;
 
-        judge_cnt = 0;
-        for (int i = 0; i < ROBOT_NUM; i++){
-            if(std::fabs(ControlGetY()(i)) < dis_th && std::fabs(ControlGetX()(i)) < dis_th){
-                judge_cnt++;
-            }
-            if(judge_cnt == 5){
-                is_conv = true;
-            }
-        }
+        if(StopCondition()) break;
 
         /* Swarm robot move */
         for(int i = 0; i < ROBOT_NUM; i++) {
@@ -133,11 +136,7 @@ int main(int argc, char** argv) {
 
         /* Time sleep for robot move */
         ros::Duration(0.05).sleep();
-
-        /* Get swarm robot poses */
-        PositionRefresh(swarm_robot);
     }
-
 
     /* Stop all robots */
     swarm_robot.stopRobot();
