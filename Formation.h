@@ -25,6 +25,6 @@ extern Eigen::VectorXd expectedY;
 void FormationChoose();
 void FormationChoose(int formationIndex);
 void FormationChoose(int formationIndex, double theta);
-formation_cost_t targetCost(Eigen::VectorXd *[2]);
+void FormationChooseDirect(int formationIndex);
 
 #endif //SRC_FORMATION_H

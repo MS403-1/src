@@ -50,13 +50,6 @@ void map_init(Eigen::VectorXd *positionToCenter, form_info_t formInfo, double th
                 );
         }
     }
-
-    for(auto i = 0; i < ROBOT_NUM; i++){
-        for(auto j = 0; j < ROBOT_NUM; j++){
-            ROS_INFO("%f ", Map[i + 1][j + 1]);
-        }
-        ROS_INFO("\r\n");
-    }
 }
 
 Eigen::VectorXd centerPosition[2];
@@ -156,5 +149,16 @@ void FormationChoose(int formationIndex, double theta){
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
         expectedX[robotIndex] = centerPosition[0](nowp[robotIndex]) + cos(theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + sin(theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
         expectedY[robotIndex] = centerPosition[1](nowp[robotIndex]) - sin(theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + cos(theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
+    }
+}
+
+void FormationChooseDirect(int formationIndex){
+
+    InitFormationParas();
+    UpdateCenterPosition();
+
+    for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
+        expectedX[robotIndex] = centerPosition[0](robotIndex) + (*forms[formationIndex][0])(robotIndex);
+        expectedY[robotIndex] = centerPosition[1](robotIndex) + (*forms[formationIndex][1])(robotIndex);
     }
 }
