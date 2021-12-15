@@ -9,7 +9,7 @@
 
 #include "Position&Control.h"
 
-void RVO(const Eigen::VectorXd& v, Eigen::VectorXd& theta);
-void VO(const Eigen::VectorXd& v, Eigen::VectorXd& theta);
+void RVO(const Eigen::VectorXd& x,const Eigen::VectorXd& y,const Eigen::VectorXd& v, Eigen::VectorXd& theta);
+void VO(const Eigen::VectorXd& x,const Eigen::VectorXd& y,const Eigen::VectorXd& v, Eigen::VectorXd& theta);
 
 #endif //SRC_RVO_H
