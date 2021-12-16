@@ -119,8 +119,8 @@ int main(int argc, char** argv) {
         }
             //avoid face to face crash
             //ObstacleAvoidance(v, w, i);
-            RVO(PositionGetX(),PositionGetY(),d, d_);
-            VO(ObstacleGetX(),ObstacleGetY(),PositionGetX(),PositionGetY(),d, d_);
+            RVO(d, d_);
+            VO(d, d_);
             //move the robot
 
         for(int i = 0; i < ROBOT_NUM; i++) {
