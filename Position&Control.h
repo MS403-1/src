@@ -11,18 +11,24 @@
 #include "Params.h"
 
 void PositionRefresh(SwarmRobot& swarm_robot);
+void CenterPositionRefresh();
 
-Eigen::VectorXd& PositionGetX();
-Eigen::VectorXd& PositionGetY();
-Eigen::VectorXd& PositionGetTheta();
+const Eigen::VectorXd& PositionGetX();
+const Eigen::VectorXd& PositionGetY();
+const Eigen::VectorXd& PositionGetTheta();
 
 Eigen::VectorXd& ControlGetX();
 Eigen::VectorXd& ControlGetY();
 Eigen::VectorXd& ControlGetTheta();
 
-Eigen::VectorXd& ObstacleGetX();
-Eigen::VectorXd& ObstacleGetY();
-Eigen::VectorXd& ObstacleGetTheta();
+const Eigen::VectorXd& ObstacleGetX();
+const Eigen::VectorXd& ObstacleGetY();
+const Eigen::VectorXd& ObstacleGetTheta();
+
+const Eigen::VectorXd& CenterGetX();
+const Eigen::VectorXd& CenterGetY();
+
+extern Eigen::VectorXd positionToCenter[2];
 
 void ControlX(const Eigen::VectorXd& vx);
 void ControlY(const Eigen::VectorXd& vy);
