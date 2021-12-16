@@ -4,8 +4,6 @@
 
 #include "Position&Control.h"
 
-extern std::vector<int> swarm_robot_id;
-
 /* Mobile robot poses and for next poses */
 Eigen::VectorXd cur_x(ROBOT_NUM);
 Eigen::VectorXd cur_y(ROBOT_NUM);
@@ -39,6 +37,7 @@ void PositionRefresh(SwarmRobot& swarm_robot){
     }
 
     /* Obstacle */
+    if(OBSTACLE_NUM == 0) return;
     for(auto i = ROBOT_NUM; i < ROBOT_NUM + OBSTACLE_NUM; i++){
         obstacle_x(i) = current_robot_pose[i][0];
         obstacle_y(i) = current_robot_pose[i][1];

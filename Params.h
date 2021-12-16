@@ -5,7 +5,6 @@
 #ifndef SRC_PARAMS_H
 #define SRC_PARAMS_H
 
-constexpr int M = 11;
 constexpr int N = 11;
 
 /* First: Set ids of swarm robot based on Aruco marker */

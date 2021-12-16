@@ -4,8 +4,12 @@
 
 #include "RVO.h"
 
-constexpr double ROBOT_RADIUS = 0.2;
-constexpr double DETECTION_LENGTH = 3;
+constexpr double ROBOT_RADIUS = 0.5;
+constexpr double DETECTION_LENGTH = 1;
+
+inline double cot(double x){
+    return cos(x) / sin(x);
+}
 
 /**
  * @brief Reciprocal Velocity Obstacle Algorithm
@@ -24,8 +28,8 @@ void RVO(const Eigen::VectorXd& v, Eigen::VectorXd& theta){
      */
     for(auto i = 0; i < ROBOT_NUM; i++){
         for(auto j = 0; j < ROBOT_NUM; j++){
-            z[i][j][0] = PositionGetX(j) - PositionGetX(i);
-            z[i][j][1] = PositionGetY(j) - PositionGetY(i);
+            z[i][j][0] = PositionGetX()(j) - PositionGetX()(i);
+            z[i][j][1] = PositionGetY()(j) - PositionGetY()(i);
             u[i][j][0] = v(j) * cot(theta(j)) - v(i) * cot(theta(i));
             u[i][j][1] = v(j) * tan(theta(j)) - v(i) * tan(theta(i));
             d[i][j] = (u[i][j][0] * z[i][j][1] - u[i][j][1] * z[i][j][0]) / sqrt(u[i][j][0] * u[i][j][0] + u[i][j][1] * u[i][j][1]);
@@ -56,16 +60,18 @@ void RVO(const Eigen::VectorXd& v, Eigen::VectorXd& theta){
  */
 void VO(const Eigen::VectorXd& v, Eigen::VectorXd& theta){
 
-    double z[ROBOT_NUM][OBSTACLE_NUM][2] = {0}; //The relative position
-    double d[ROBOT_NUM][OBSTACLE_NUM] = {0}; //The minimum distance of center
+    if(OBSTACLE_NUM == 0) return;
+
+    double z[ROBOT_NUM][OBSTACLE_NUM][2]; //The relative position
+    double d[ROBOT_NUM][OBSTACLE_NUM]; //The minimum distance of center
 
     /**
      * Initialize the tables
      */
     for(auto i = 0; i < ROBOT_NUM; i++){
         for(auto j = 0; j < OBSTACLE_NUM; j++){
-            z[i][j][0] = ObstacleGetX(j) - PositionGetX(i);
-            z[i][j][1] = ObstacleGetY(j) - PositionGetY(i);
+            z[i][j][0] = ObstacleGetX()(j) - PositionGetX()(i);
+            z[i][j][1] = ObstacleGetY()(j) - PositionGetY()(i);
             d[i][j] = (v(i) * cot(theta(j)) * z[i][j][1] - v(i) * tan(theta(i)) * z[i][j][0]) / v(i);
         }
     }
