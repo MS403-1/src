@@ -10,7 +10,7 @@
 #include "Position&Control.h"
 #include "Hungary.h"
 #include "Formation.h"
-#include "Obstacle.h"
+#include "RVO.h"
 
 using namespace std;
 
@@ -50,12 +50,18 @@ int main(int argc, char** argv) {
      * April detection initialization
      */
     std::vector<int> agent_id(ROBOT_NUM + OBSTACLE_NUM);
-    for(auto it : swarm_robot_id){
+/*    for(auto it : swarm_robot_id){
         agent_id.push_back(it);
+    }*/
+    for(auto i = 0; i < ROBOT_NUM; i++){
+        agent_id[i] = swarm_robot_id[i];
     }
+
     for(auto it : obstacle_id){
         agent_id.push_back(it);
     }
+
+    ROS_INFO("%zu %d %d\r\n", agent_id.size(), ROBOT_NUM, OBSTACLE_NUM);
 
     /* Initialize swarm robot */
     SwarmRobot swarm_robot(&nh, agent_id);
@@ -106,21 +112,23 @@ int main(int argc, char** argv) {
         if(StopCondition()) break;
 
         /* Swarm robot move */
+        vector<double> v_x(ROBOT_NUM), v_y(ROBOT_NUM), v_direction(ROBOT_NUM);
+
         for(int i = 0; i < ROBOT_NUM; i++) {
             //determine the velocity
-            double v_x = ControlGetX()(i) * k_v;
-            double v_y = ControlGetY()(i) * k_v;
-            double v_direction = atan2(v_y, v_x);
+            v_x[i] = ControlGetX()(i) * k_v;
+            v_y[i] = ControlGetY()(i) * k_v;
+            v_direction[i] = atan2(v_y[i], v_x[i]);
 
-            d(i)=sqrt(v_x*v_x + v_y*v_y);
-            d_(i)=v_direction;
+            d(i) = sqrt(v_x[i] * v_x[i] + v_y[i] * v_y[i]);
+            d_(i) = v_direction[i];
 
             //std::cout << 'w' << i << "= "  << w << std::endl;
         }
             //avoid face to face crash
             //ObstacleAvoidance(v, w, i);
             RVO(d, d_);
-            VO(d, d_);
+            //VO(d, d_);
             //move the robot
 
         for(int i = 0; i < ROBOT_NUM; i++) {
@@ -130,7 +138,7 @@ int main(int argc, char** argv) {
 
             //determine the omega
             //if (i==1){std::cout<<"vx = "<<v_x<<"; vy = "<<v_y<<"; dire_w = "<<dire_w<<"; cur_theta = "<<cur_theta(i)<<"; v_direction = "<<v_direction<<std::endl;}
-            double w = (20*sqrt(v_x*v_x + v_y*v_y)*dire_w)*k_w;
+            double w = (20*sqrt(v_x[i]*v_x[i] + v_y[i]*v_y[i])*dire_w)*k_w;
             w = swarm_robot.checkVel(w, MAX_W, MIN_W);
             v = swarm_robot.checkVel(v, MAX_V, MIN_V);
             swarm_robot.moveRobot(i, v, w);

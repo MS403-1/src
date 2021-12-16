@@ -4,8 +4,6 @@
 
 #include "Position&Control.h"
 
-extern std::vector<int> swarm_robot_id;
-
 /** Mobile robot poses and for next poses */
 Eigen::VectorXd cur_x(ROBOT_NUM);
 Eigen::VectorXd cur_y(ROBOT_NUM);
@@ -26,7 +24,7 @@ Eigen::VectorXd positionToCenter[2];
 /**
  * Warning: The following vector is assigned with static memory size, this may cause exception when index is over ROBOT_NUM
  */
-std::vector<std::vector<double>> current_robot_pose(ROBOT_NUM + OBSTACLE_NUM);
+ std::vector<std::vector<double>> current_robot_pose(ROBOT_NUM + OBSTACLE_NUM);
 
 extern SwarmRobot swarm_robot;
 
@@ -34,15 +32,16 @@ void PositionRefresh(SwarmRobot& swarm_robot){
 
     /* Get swarm robot poses firstly */
     swarm_robot.getRobotPose(current_robot_pose);
-
+    
     /* x,y,theta */
     for(auto i = 0; i < ROBOT_NUM; i++) {
         cur_x(i) = current_robot_pose[i][0];
         cur_y(i) = current_robot_pose[i][1];
         cur_theta(i) = current_robot_pose[i][2];
     }
-
+    
     /* Obstacle */
+    if(OBSTACLE_NUM == 0) return;
     for(auto i = ROBOT_NUM; i < ROBOT_NUM + OBSTACLE_NUM; i++){
         obstacle_x(i) = current_robot_pose[i][0];
         obstacle_y(i) = current_robot_pose[i][1];
