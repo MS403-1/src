@@ -30,6 +30,7 @@ extern SwarmRobot swarm_robot;
 
 void PositionRefresh(SwarmRobot& swarm_robot){
 
+    
     /* Get swarm robot poses firstly */
     swarm_robot.getRobotPose(current_robot_pose);
     
@@ -43,9 +44,9 @@ void PositionRefresh(SwarmRobot& swarm_robot){
     /* Obstacle */
     if(OBSTACLE_NUM == 0) return;
     for(auto i = ROBOT_NUM; i < ROBOT_NUM + OBSTACLE_NUM; i++){
-        obstacle_x(i) = current_robot_pose[i][0];
-        obstacle_y(i) = current_robot_pose[i][1];
-        obstacle_theta(i) = current_robot_pose[i][2];
+        obstacle_x(i - ROBOT_NUM) = current_robot_pose[i][0];
+        obstacle_y(i - ROBOT_NUM) = current_robot_pose[i][1];
+        obstacle_theta(i - ROBOT_NUM) = current_robot_pose[i][2];
     }
 }
 
