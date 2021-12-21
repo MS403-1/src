@@ -7,6 +7,13 @@
 constexpr double ROBOT_RADIUS = 0.5;
 constexpr double DETECTION_LENGTH = 1;
 
+inline int sign(double x)
+{
+    int a=(x>0);
+    if(a==0)
+    a=-(x<0);
+    return a;
+}
 inline double cot(double x){
     return cos(x) / sin(x);
 }
@@ -46,7 +53,7 @@ void RVO(const Eigen::VectorXd& v, Eigen::VectorXd& theta){
                 (u[i][j][0] * z[i][j][0] + u[i][j][1] * z[i][j][1]<0) \
                 && \
                 (sqrt(z[i][j][0] * z[i][j][0] + z[i][j][1] * z[i][j][1]) < DETECTION_LENGTH)){
-                theta(i) += d[i][j] / 2 * sqrt(z[i][j][0] * z[i][j][0] + z[i][j][1] * z[i][j][1]);
+                theta(i) += (ROBOT_RADIUS * sign(d[i][j]) - d[i][j]) / 2 * sqrt(z[i][j][0] * z[i][j][0] + z[i][j][1] * z[i][j][1]);
             }
         }
     }
@@ -83,7 +90,7 @@ void VO(const Eigen::VectorXd& v, Eigen::VectorXd& theta){
                 (v(i) * cot(theta(j)) * z[i][j][0] + v(i) * tan(theta(j)) * z[i][j][1] < 0) \
                 && \
                 (sqrt(z[i][j][0] * z[i][j][0] + z[i][j][1] * z[i][j][1]) < DETECTION_LENGTH)){
-                theta(i) += d[i][j] / v(i);
+                theta(i) +=  (ROBOT_RADIUS * sign(d[i][j]) - d[i][j]) / v(i);
             }
         }
     }
