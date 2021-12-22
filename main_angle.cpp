@@ -10,22 +10,12 @@
 #include "Position&Control.h"
 #include "Hungary.h"
 #include "Formation.h"
+#include "KeyboardCtrl.h"
 #include "RVO.h"
 
 using namespace std;
 
-/* Convergence threshold */
-constexpr double conv_th = 0.2;   // Threshold of angle, in rad
-constexpr double dis_th = 0.05;    // Threshold of distance, in m
-constexpr double angle_th = 0.05;  // Threshold of angle, in rad
 
-/* Velocity scale and threshold */
-constexpr double MAX_W = 1;       // Maximum angle velocity (rad/s)
-constexpr double MIN_W = 0.05;    // Minimum angle velocity(rad/s)
-constexpr double MAX_V = 0.2;     // Maximum linear velocity(m/s)
-constexpr double MIN_V = 0.01;    // Minimum linear velocity(m/s)
-constexpr double k_w = 0.12;       // Scale of angle velocity
-constexpr double k_v = 0.1;       // Scale of linear velocity
 
 bool StopCondition() {
     static int judge_cnt = 0;
@@ -143,6 +133,8 @@ int main(int argc, char** argv) {
             v = swarm_robot.checkVel(v, MAX_V, MIN_V);
             swarm_robot.moveRobot(i, v, w);
         }
+
+        KeyboardCtrl(&nh,&swarm_robot,4);
 
         /* Time sleep for robot move */
         ros::Duration(0.05).sleep();
