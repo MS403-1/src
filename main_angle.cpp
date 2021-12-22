@@ -12,6 +12,7 @@
 #include "Formation.h"
 #include "KeyboardCtrl.h"
 #include "RVO.h"
+#include "PathPlanning.h"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ bool StopCondition() {
     return false;
 }
 
+
 /* Main function */
 int main(int argc, char** argv) {
 
@@ -39,17 +41,24 @@ int main(int argc, char** argv) {
     /**
      * April detection initialization
      */
+
     std::vector<int> agent_id(ROBOT_NUM + OBSTACLE_NUM);
 /*    for(auto it : swarm_robot_id){
         agent_id.push_back(it);
     }*/
+
     for(auto i = 0; i < ROBOT_NUM; i++){
         agent_id[i] = swarm_robot_id[i];
     }
 
-    for(auto it : obstacle_id){
-        agent_id.push_back(it);
+    for(auto i = 0; i < OBSTACLE_NUM; i++){
+        agent_id[i + ROBOT_NUM] = obstacle_id[i];
     }
+
+
+/*    for(auto it : obstacle_id){
+        agent_id.push_back(it);
+    }*/
 
     ROS_INFO("%zu %d %d\r\n", agent_id.size(), ROBOT_NUM, OBSTACLE_NUM);
 
@@ -79,18 +88,29 @@ int main(int argc, char** argv) {
 //    bool is_shaped = false;    // Convergence sign of shape
 //    bool is_conv = false;      // Convergence sign of agents
 
+    PositionRefresh(swarm_robot);
+
+    CenterPositionRefresh();
+
+    PathInitialization(SIMPLE_PLAN, {12, 12, 0});
+
+
+
     /* While loop */
     while(true) {
 
         /* Get swarm robot poses */
         PositionRefresh(swarm_robot);
 
+
         static int cnt = 10;
         cnt++;
         if(cnt > 10){
             cnt = 0;
-            FormationChooseDirect(0);
+            FormationChoose();
         }
+
+        PathExec();
 
         /* Judge whether reached */
         ControlTheta(-lap * PositionGetTheta());
@@ -117,7 +137,7 @@ int main(int argc, char** argv) {
         }
             //avoid face to face crash
             //ObstacleAvoidance(v, w, i);
-            RVO(d, d_);
+        RVO(d, d_);
             //VO(d, d_);
             //move the robot
 
@@ -146,3 +166,10 @@ int main(int argc, char** argv) {
     ROS_INFO_STREAM("Succeed!");
     return 0;
 }
+
+
+/*std::cout << "=================check111============================" << std::endl;
+std::cout << "=================check222============================" << std::endl;
+std::cout << "=================check333============================" << std::endl;
+std::cout << "=================check444============================" << std::endl;
+std::cout << "=================check555============================" << std::endl;*/

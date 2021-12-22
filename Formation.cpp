@@ -98,8 +98,8 @@ void FormationChoose(){
     }
 
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
-        expectedX[robotIndex] = CenterGetX(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + sin(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
-        expectedY[robotIndex] = CenterGetY(nowp[robotIndex]) - sin(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
+        expectedX[robotIndex] = CenterGetX()(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + sin(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
+        expectedY[robotIndex] = CenterGetY()(nowp[robotIndex]) - sin(formCostMin.theta) * (*forms[formCostMinIndex][0])(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formCostMinIndex][1])(nowp[robotIndex]);
     }
 }
 
@@ -112,8 +112,8 @@ void FormationChoose(int formationIndex){
     storeP();
 
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
-        expectedX[robotIndex] = CenterGetX(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + sin(formCostMin.theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
-        expectedY[robotIndex] = CenterGetY(nowp[robotIndex]) - sin(formCostMin.theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
+        expectedX[robotIndex] = CenterGetX()(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + sin(formCostMin.theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
+        expectedY[robotIndex] = CenterGetY()(nowp[robotIndex]) - sin(formCostMin.theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + cos(formCostMin.theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
     }
 }
 
@@ -127,8 +127,8 @@ void FormationChoose(int formationIndex, double theta){
     storeP();
 
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
-        expectedX[robotIndex] = CenterGetX(nowp[robotIndex]) + cos(theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + sin(theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
-        expectedY[robotIndex] = CenterGetY(nowp[robotIndex]) - sin(theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + cos(theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
+        expectedX[robotIndex] = CenterGetX()(nowp[robotIndex]) + cos(theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + sin(theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
+        expectedY[robotIndex] = CenterGetY()(nowp[robotIndex]) - sin(theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + cos(theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
     }
 }
 
@@ -138,7 +138,7 @@ void FormationChooseDirect(int formationIndex){
     CenterPositionRefresh();
 
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
-        expectedX[robotIndex] = CenterGetX(robotIndex) + (*forms[formationIndex][0])(robotIndex);
-        expectedY[robotIndex] = CenterGetY(robotIndex) + (*forms[formationIndex][1])(robotIndex);
+        expectedX[robotIndex] = CenterGetX()(robotIndex) + (*forms[formationIndex][0])(robotIndex);
+        expectedY[robotIndex] = CenterGetY()(robotIndex) + (*forms[formationIndex][1])(robotIndex);
     }
 }
