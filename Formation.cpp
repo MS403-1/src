@@ -125,7 +125,7 @@ void FormationChoose(int formationIndex, double theta){
     map_init(positionToCenter, forms[formationIndex], theta);
     calc(Map, ROBOT_NUM);
     storeP();
-
+    
     for(auto robotIndex = 0; robotIndex < ROBOT_NUM; robotIndex++){
         expectedX[robotIndex] = CenterGetX()(nowp[robotIndex]) + cos(theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + sin(theta) * (*forms[formationIndex][1])(nowp[robotIndex]);
         expectedY[robotIndex] = CenterGetY()(nowp[robotIndex]) - sin(theta) * (*forms[formationIndex][0])(nowp[robotIndex]) + cos(theta) * (*forms[formationIndex][1])(nowp[robotIndex]);

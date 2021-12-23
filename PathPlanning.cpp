@@ -8,7 +8,7 @@
  * Part 1: Planning
  */
 
-constexpr double PLAN_INTERVAL = 0.1;
+constexpr double PLAN_INTERVAL = 0.8;
 
 std::vector<path_plan_t> centerPath;
 
@@ -27,23 +27,27 @@ int PathNodeAdd(double x0, double y0, double x1, double y1){
 void PathInitializationSimple(path_plan_t target){
     
     centerPath.push_back({CenterGetX()[0], CenterGetY()[0], 0});
+    centerPath.push_back({3, 3, 0});
+    centerPath.push_back({3, 5, 0});
+    centerPath.push_back({3, 7, 0});
+    centerPath.push_back({3, 9, 0});
     
     /**
      * Case 1: The desired path is parallel to x axis
      */
     
-    if((ObstacleGetY()[1] - ObstacleGetY()[0])*(ObstacleGetY()[1] - ObstacleGetY()[0]) < 0.05*0.05){
+    //if((ObstacleGetY()[1] - ObstacleGetY()[0])*(ObstacleGetY()[1] - ObstacleGetY()[0]) < 0.05*0.05){
         
-        /** x, y -> x, (y0 + y1) / 2 */
-        PathNodeAdd(CenterGetX()[0], CenterGetY()[0], CenterGetX()[0], (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2);
-
-        /** x, y -> (x0 + x1) / 2, (y0 + y1) / 2 */
-        PathNodeAdd(CenterGetX()[0], (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2, (ObstacleGetX()[0] + ObstacleGetX()[1]) / 2, (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2);
-
-        /** x, y -> x*, y* */
-        PathNodeAdd((ObstacleGetX()[0] + ObstacleGetX()[1]) / 2, (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2, target.x, target.y);
-        
-    }
+//        /** x, y -> x, (y0 + y1) / 2 */
+//        PathNodeAdd(CenterGetX()[0], CenterGetY()[0], CenterGetX()[0], (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2);
+//
+//        /** x, y -> (x0 + x1) / 2, (y0 + y1) / 2 */
+//        PathNodeAdd(CenterGetX()[0], (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2, (ObstacleGetX()[0] + ObstacleGetX()[1]) / 2, (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2);
+//
+//        /** x, y -> x*, y* */
+//        PathNodeAdd((ObstacleGetX()[0] + ObstacleGetX()[1]) / 2, (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2, target.x, target.y);
+//
+   // }
 
 
     /**
@@ -71,10 +75,16 @@ void PathInitialization(plan_type_e planType, path_plan_t target){
  * Part 2: Execution
  */
 
-constexpr double PATH_EXEC_ERR = 0.05;
+constexpr double PATH_EXEC_ERR = 0.8;
 
 bool PathGetToTarget(const std::vector<path_plan_t>::iterator it){
-    if((*it).x * (*it).x + (*it).y * (*it).y < PATH_EXEC_ERR * PATH_EXEC_ERR) return true;
+    cout << it->x << ' ' << it->y << endl;
+    cout << CenterGetX()[0] << ' ' << CenterGetY()[0] << endl;
+    cout << ((*it).x - CenterGetX()[0]) * ((*it).x - CenterGetX()[0]) + ((*it).y - CenterGetY()[0]) * ((*it).y - CenterGetY()[0]) << endl;
+
+    if(((*it).x - CenterGetX()[0]) * ((*it).x - CenterGetX()[0]) + ((*it).y - CenterGetY()[0]) * ((*it).y - CenterGetY()[0]) < PATH_EXEC_ERR * PATH_EXEC_ERR) {
+        return true;
+    }
     else return false;
 }
 
@@ -84,6 +94,12 @@ void PathExec(){
         if(path_it != centerPath.end()) path_it++;
     }
 
-    expectedX += Eigen::VectorXd(ROBOT_NUM).setOnes() * ((*path_it).x - (*(path_it - 1)).x);
-    expectedY += Eigen::VectorXd(ROBOT_NUM).setOnes() * ((*path_it).x - (*(path_it - 1)).x);
+    for(auto i = 0; i < ROBOT_NUM; i++){
+        expectedX[i] += (*path_it).x - CenterGetX()[i];
+        expectedY[i] += (*path_it).y - CenterGetY()[i];
+
+        cout << expectedX[i] << ' ' << expectedY[i] << endl;
+    }
+/*    expectedX += Eigen::VectorXd(ROBOT_NUM).setOnes() * ((*path_it).x - (*(path_it - 1)).x);
+    expectedY += Eigen::VectorXd(ROBOT_NUM).setOnes() * ((*path_it).y - (*(path_it - 1)).y);*/
 }
