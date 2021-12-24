@@ -144,6 +144,10 @@ int main(int argc, char** argv) {
             if(dire_w > 3.14) dire_w -= 6.28;
 
             double v = d(i) * cos(dire_w);
+            if(v < 0){
+                dire_w += 3.14;
+                if(dire_w > 3.14) dire_w -= 6.28;
+            }
             //std::cout << 'v' << i << "= " << v << std::endl;
 
             //determine the omega
