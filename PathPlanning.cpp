@@ -29,10 +29,6 @@ int PathNodeAdd(double x0, double y0, double x1, double y1){
 void PathInitializationSimple(path_plan_t target){
     
     centerPath.push_back({CenterGetX()[0], CenterGetY()[0], 0});
-    centerPath.push_back({3, 3, 0});
-    centerPath.push_back({3, 5, 0});
-    centerPath.push_back({3, 7, 0});
-    centerPath.push_back({3, 9, 0});
     
     /**
      * Case 1: The desired path is parallel to x axis
@@ -40,15 +36,15 @@ void PathInitializationSimple(path_plan_t target){
     
     //if((ObstacleGetY()[1] - ObstacleGetY()[0])*(ObstacleGetY()[1] - ObstacleGetY()[0]) < 0.05*0.05){
         
-//        /** x, y -> x, (y0 + y1) / 2 */
-//        PathNodeAdd(CenterGetX()[0], CenterGetY()[0], CenterGetX()[0], (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2);
-//
-//        /** x, y -> (x0 + x1) / 2, (y0 + y1) / 2 */
-//        PathNodeAdd(CenterGetX()[0], (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2, (ObstacleGetX()[0] + ObstacleGetX()[1]) / 2, (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2);
-//
-//        /** x, y -> x*, y* */
-//        PathNodeAdd((ObstacleGetX()[0] + ObstacleGetX()[1]) / 2, (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2, target.x, target.y);
-//
+        /** x, y -> x, (y0 + y1) / 2 */
+        PathNodeAdd(CenterGetX()[0], CenterGetY()[0], CenterGetX()[0], (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2);
+
+        /** x, y -> (x0 + x1) / 2, (y0 + y1) / 2 */
+        PathNodeAdd(CenterGetX()[0], (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2, (ObstacleGetX()[0] + ObstacleGetX()[1]) / 2, (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2);
+
+        /** x, y -> x*, y* */
+        PathNodeAdd((ObstacleGetX()[0] + ObstacleGetX()[1]) / 2, (ObstacleGetY()[0] + ObstacleGetY()[1]) / 2, target.x, target.y);
+
    // }
 
 

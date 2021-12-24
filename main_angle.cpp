@@ -103,9 +103,9 @@ int main(int argc, char** argv) {
 
         static int cnt = 10;
         cnt++;
-        if(cnt > 10){
+        if(cnt > 0){
             cnt = 0;
-            FormationChooseDirect(0);
+            FormationChoose();
             PathExec();
         }
 
