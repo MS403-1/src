@@ -89,7 +89,7 @@ void VO(const Eigen::VectorXd& v, Eigen::VectorXd& theta){
                 (v(i) * cot(theta(j)) * z[i][j][0] + v(i) * tan(theta(j)) * z[i][j][1] < 0) \
                 && \
                 (sqrt(z[i][j][0] * z[i][j][0] + z[i][j][1] * z[i][j][1]) < DETECTION_LENGTH)){
-                theta(i) +=  (ROBOT_RADIUS * sign(d[i][j]) - d[i][j]) / v(i);
+                theta(i) += sign(d[i][j]) * (ROBOT_RADIUS - d[i][j]) / v(i);
             }
         }
     }
