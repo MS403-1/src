@@ -12,6 +12,8 @@ constexpr double PLAN_INTERVAL = 0.8;
 
 std::vector<path_plan_t> centerPath;
 
+double expectedCenter[2] = {0};
+
 int PathNodeAdd(double x0, double y0, double x1, double y1){
     
     double distance = sqrt((x0 - x1) * (x0 - x1) + (y0 - y1) * (y0 - y1));
@@ -94,12 +96,15 @@ void PathExec(){
         if(path_it != centerPath.end()) path_it++;
     }
 
-    for(auto i = 0; i < ROBOT_NUM; i++){
+    expectedCenter[0] = path_it->x;
+    expectedCenter[1] = path_it->y;
+
+/*    for(auto i = 0; i < ROBOT_NUM; i++){
         expectedX[i] += (*path_it).x - CenterGetX()[i];
         expectedY[i] += (*path_it).y - CenterGetY()[i];
 
         cout << expectedX[i] << ' ' << expectedY[i] << endl;
-    }
+    }*/
 /*    expectedX += Eigen::VectorXd(ROBOT_NUM).setOnes() * ((*path_it).x - (*(path_it - 1)).x);
     expectedY += Eigen::VectorXd(ROBOT_NUM).setOnes() * ((*path_it).y - (*(path_it - 1)).y);*/
 }

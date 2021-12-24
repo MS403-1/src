@@ -20,6 +20,8 @@ typedef struct {
     double theta;
 } path_plan_t;
 
+extern double expectedCenter[];
+
 void PathInitialization(plan_type_e planType, path_plan_t target);
 void PathExec();
 

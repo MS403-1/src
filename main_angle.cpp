@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
         if(cnt > 10){
             cnt = 0;
             FormationChooseDirect(0);
-          // PathExec();
+            PathExec();
         }
 
         /* Judge whether reached */
@@ -123,8 +123,8 @@ int main(int argc, char** argv) {
 
         for(int i = 0; i < ROBOT_NUM; i++) {
             //determine the velocity
-            v_x[i] = ControlGetX()[i] * k_v;
-            v_y[i] = ControlGetY()[i] * k_v;
+            v_x[i] = ControlGetX()[i] * k_v + (expectedCenter[0] - CenterGetX()[0]) * k_v;
+            v_y[i] = ControlGetY()[i] * k_v + (expectedCenter[1] - CenterGetY()[0]) * k_v;
             v_direction[i] = atan2(v_y[i], v_x[i]);
 
             d(i) = sqrt(v_x[i] * v_x[i] + v_y[i] * v_y[i]);
