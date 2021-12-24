@@ -103,10 +103,10 @@ int main(int argc, char** argv) {
 
         static int cnt = 10;
         cnt++;
-        if(cnt > 0){
+        if(cnt > 10){
             cnt = 0;
-            FormationChoose(0, 0);
-            PathExec();
+            FormationChooseDirect(0);
+          // PathExec();
         }
 
         /* Judge whether reached */
@@ -116,15 +116,15 @@ int main(int argc, char** argv) {
         //std::cout << "cur_x" << "= " << cur_x << std::endl;
         //std::cout << "del_x" << "= " << del_x << std::endl;
 
-      //  if(StopCondition()) break;
+        //if(StopCondition()) break;
 
         /* Swarm robot move */
         vector<double> v_x(ROBOT_NUM), v_y(ROBOT_NUM), v_direction(ROBOT_NUM);
 
         for(int i = 0; i < ROBOT_NUM; i++) {
             //determine the velocity
-            v_x[i] = ControlGetX()(i) * k_v;
-            v_y[i] = ControlGetY()(i) * k_v;
+            v_x[i] = ControlGetX()[i] * k_v;
+            v_y[i] = ControlGetY()[i] * k_v;
             v_direction[i] = atan2(v_y[i], v_x[i]);
 
             d(i) = sqrt(v_x[i] * v_x[i] + v_y[i] * v_y[i]);
@@ -134,18 +134,21 @@ int main(int argc, char** argv) {
         }
             //avoid face to face crash
             //ObstacleAvoidance(v, w, i);
-        //RVO(d, d_);
+        RVO(d, d_);
             //VO(d, d_);
             //move the robot
 
         for(int i = 0; i < ROBOT_NUM; i++) {
             double dire_w = d_(i) - PositionGetTheta()(i);
+            if(dire_w < -3.14) dire_w += 6.28;
+            if(dire_w > 3.14) dire_w -= 6.28;
+
             double v = d(i) * cos(dire_w);
             //std::cout << 'v' << i << "= " << v << std::endl;
 
             //determine the omega
             //if (i==1){std::cout<<"vx = "<<v_x<<"; vy = "<<v_y<<"; dire_w = "<<dire_w<<"; cur_theta = "<<cur_theta(i)<<"; v_direction = "<<v_direction<<std::endl;}
-            double w = (20*(sqrt(v_x[i]*v_x[i] + v_y[i]*v_y[i]) + 1)*dire_w)*k_w;
+            double w = (20*sqrt(v_x[i]*v_x[i] + v_y[i]*v_y[i])*dire_w)*k_w;
             w = swarm_robot.checkVel(w, MAX_W, MIN_W);
             v = swarm_robot.checkVel(v, MAX_V, MIN_V);
             swarm_robot.moveRobot(i, v, w);
